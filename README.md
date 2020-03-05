@@ -17,12 +17,14 @@ An SSR oriented HTML content generator.
   * `raw` tag to pass through an interpolation any kind of content, even partial layout
   * `html` tag to define any simple to complex layout, with a `.min()` method to produce minified HTML content ([html-minifier based](https://www.npmjs.com/package/html-minifier))
 
+All tag returns a specialized `instanceof String`, if used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
+
 By default, all interpolated content is escaped, unless it was passed via `raw`.
 
 
 ### Attributes Logic
 
-  * all attributes are escaped by default (still with the `raw` exception)
+  * all attributes are escaped by default
   * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
@@ -32,7 +34,7 @@ By default, all interpolated content is escaped, unless it was passed via `raw`.
 You could use the `js` tag to minified on the fly JS in attributes, but remember to pass it via `.min()`.
 The same goes for `css` in case you'd like to inline minified `style=${...}` attributes.
 
-Bear in mind both `js` and `css` minification can be expensive, and this module doesn't know anything about JS or CSS until you opt in.
+Bear in mind both `js` and `css` minification can be expensive, and this module doesn't know anything about JS or CSS until you explicitly opt in.
 
 
 #### API Summary Example

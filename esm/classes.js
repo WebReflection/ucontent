@@ -24,4 +24,5 @@ const jsOptions = {
 const minifyJS = js => uglify.minify(js, jsOptions).code;
 export class JS extends String { min() { return minifyJS(this.toString()); } };
 
-export class Raw extends String {};
+// expose `.min()` but do nothing with it
+export class Raw extends String { min() { return this.toString(); } };
