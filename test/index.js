@@ -20,7 +20,7 @@ assert(html`<div>${{}}</div>`, '<div>[object Object]</div>');
 
 assert(html`<script>${js`function test() { console.log(1); }`}</script>`, '<script>function test(){console.log(1)}</script>');
 assert(html`<style>${css`body { font-family: sans-serif; }`}</style>`, '<style>body{font-family:sans-serif}</style>');
-assert(html`<div>${raw`<bro"ken />`}</div>`, '<div><bro"ken /></div>');
+assert(html`<div>${raw`<bro"ken />`.min()}</div>`, '<div><bro"ken /></div>');
 assert(html`<div>${raw`<bro"ken ${2} />`}</div>`, '<div><bro"ken 2 /></div>');
 assert(html`<div  test="${true}"></div>`.min(), '<div test=true></div>');
 assert(html`<div  test="${123}"></div>`.min(), '<div test=123></div>');
