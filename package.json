@@ -1,0 +1,29 @@
+{
+  "name": "ucontent",
+  "version": "0.0.0",
+  "description": "An SSR HTML content generator",
+  "main": "cjs/index.js",
+  "scripts": {
+    "build": "npm run cjs && npm run test",
+    "cjs": "ascjs esm cjs",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "test": "nyc node test/index.js"
+  },
+  "keywords": ["html", "ssr", "content"],
+  "author": "Andrea Giammarchi",
+  "license": "ISC",
+  "devDependencies": {
+    "ascjs": "^3.1.2",
+    "coveralls": "^3.0.9",
+    "nyc": "^15.0.0"
+  },
+  "module": "esm/index.js",
+  "dependencies": {
+    "csso": "^4.0.2",
+    "html-escaper": "^2.0.0",
+    "html-minifier": "^4.0.0",
+    "hyphenizer": "^0.1.1",
+    "uglify-es": "^3.3.9",
+    "uparser": "^0.1.0"
+  }
+}
