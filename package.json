@@ -1,7 +1,7 @@
 {
   "name": "ucontent",
   "version": "0.1.0",
-  "description": "An SSR HTML content generator",
+  "description": "An SSR oriented HTML content generator",
   "main": "cjs/index.js",
   "scripts": {
     "build": "npm run cjs && npm run test && npm run bench",
