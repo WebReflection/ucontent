@@ -17,9 +17,9 @@ An SSR oriented HTML content generator.
   * `raw` tag to pass through an interpolation any kind of content, even partial layout
   * `html` tag to define any simple to complex layout, with a `.min()` method to produce minified HTML content ([html-minifier based](https://www.npmjs.com/package/html-minifier))
 
-All tag returns a specialized `instanceof String`, if used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
+All tags return a specialized `instanceof String`. If used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
 
-By default, all interpolated content is escaped, unless it was passed via `raw`.
+By default, all interpolated *content* is escaped, unless it was passed via `raw`.
 
 
 ### Attributes Logic
