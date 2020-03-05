@@ -4,12 +4,17 @@
   "description": "An SSR HTML content generator",
   "main": "cjs/index.js",
   "scripts": {
-    "build": "npm run cjs && npm run test",
+    "build": "npm run cjs && npm run test && npm run bench",
+    "bench": "node test/benchmark.js",
     "cjs": "ascjs esm cjs",
     "coveralls": "nyc report --reporter=text-lcov | coveralls",
     "test": "nyc node test/index.js"
   },
-  "keywords": ["html", "ssr", "content"],
+  "keywords": [
+    "html",
+    "ssr",
+    "content"
+  ],
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
@@ -25,5 +30,13 @@
     "hyphenizer": "^0.1.1",
     "uglify-es": "^3.3.9",
     "uparser": "^0.1.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WebReflection/ucontent.git"
+  },
+  "bugs": {
+    "url": "https://github.com/WebReflection/ucontent/issues"
+  },
+  "homepage": "https://github.com/WebReflection/ucontent#readme"
 }
