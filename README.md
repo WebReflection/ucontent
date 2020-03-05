@@ -1,4 +1,4 @@
-# µcontent
+# <em>µ</em>content
 
 [![Build Status](https://travis-ci.com/WebReflection/ucontent.svg?branch=master)](https://travis-ci.com/WebReflection/ucontent) [![Coverage Status](https://coveralls.io/repos/github/WebReflection/ucontent/badge.svg?branch=master)](https://coveralls.io/github/WebReflection/ucontent?branch=master)
 
@@ -25,6 +25,7 @@ By default, all interpolated content is escaped, unless it was passed via `raw`.
 ### Attributes Logic
 
   * all attributes are escaped by default
+  * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout
   * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.

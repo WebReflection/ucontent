@@ -91,7 +91,12 @@ export const parse = (cache, template, expectedLength) => {
           });
           break;
         default:
-          updates.push(value => (pre + attribute(name, quote, value)));
+          updates.push(value => {
+            let result = pre;
+            if (value != null)
+              result += attribute(name, quote, value);
+            return result;
+          });
           break;
       }
     }
