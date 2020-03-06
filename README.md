@@ -23,10 +23,10 @@ An SSR oriented HTML content generator.
 const alreadyAString = js`some code to minify`.min();
 
 // this works, but it doesn't look super nice
-html`<head>${raw`${alreadyAString}`}</head>`;
+html`<head><script>${raw`${alreadyAString}`}</script></head>`;
 
 // you can use the function form, instead of tag
-html`<head>${raw(alreadyAString)}</head>`;
+html`<head><script>${raw(alreadyAString)}</script></head>`;
 ```
 
 All tags return a specialized `instanceof String`. If used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
