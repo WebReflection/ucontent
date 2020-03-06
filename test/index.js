@@ -1,4 +1,4 @@
-const {css, js, html, raw} = require('../cjs');
+const {css, js, html, raw, svg} = require('../cjs');
 
 const assert = (ucontent, output) => {
   console.assert(ucontent == output, ucontent.toString());
@@ -7,7 +7,7 @@ const assert = (ucontent, output) => {
 assert(html`<div />`, '<div></div>');
 assert(html`<div onclick=${Object}/>`, '<div></div>');
 assert(html`<div onclick=${Object} onmouseover=${'callback(event)'}/>`, '<div onmouseover="callback(event)"></div>');
-assert(html`<div .contentEditable=${null}/>`, '<div></div>');
+assert(svg`<div .contentEditable=${null}/>`, '<div></div>');
 assert(html`<div .contentEditable=${false}/>`, '<div></div>');
 assert(html`<div .contentEditable=${true}/>`, '<div contenteditable></div>');
 assert(html`<div .whatever=${''}/>`, '<div whatever=""></div>');

@@ -24,6 +24,11 @@ exports.html = html;
 const raw = (template, ...values) => new Raw(join(template, values));
 exports.raw = raw;
 
+// this has no meaning here, but it's a "nice to have" in case a library uses
+// html, and svg functions passed along so that it works with µhtml or others
+const svg = (template, ...values) => html(template, ...values);
+exports.svg = svg;
+
 function update(value, i) {
   return this[i](value);
 }
