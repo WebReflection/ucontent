@@ -3,12 +3,21 @@ const {CSS, JS, HTML, Raw} = require('./classes.js');
 const {join, parse} = require('./utils.js');
 
 const cache = new WeakMap;
+const define = Class => (template, ...values) => new Class(
+  typeof template === 'string' ? template : join(template, values)
+);
 
-const css = (template, ...values) => new CSS(join(template, values));
+const css = define(CSS);
 exports.css = css;
-
-const js = (template, ...values) => new JS(join(template, values));
+const js = define(JS);
 exports.js = js;
+const raw = define(Raw);
+exports.raw = raw;
+
+// this has no meaning here, but it's a "nice to have" in case a library uses
+// html, and svg functions passed along so that it works with µhtml or others
+const svg = (template, ...values) => html(template, ...values);
+exports.svg = svg;
 
 const html = (template, ...values) => {
   const {length} = values;
@@ -20,14 +29,6 @@ const html = (template, ...values) => {
   );
 };
 exports.html = html;
-
-const raw = (template, ...values) => new Raw(join(template, values));
-exports.raw = raw;
-
-// this has no meaning here, but it's a "nice to have" in case a library uses
-// html, and svg functions passed along so that it works with µhtml or others
-const svg = (template, ...values) => html(template, ...values);
-exports.svg = svg;
 
 function update(value, i) {
   return this[i](value);

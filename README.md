@@ -17,6 +17,18 @@ An SSR oriented HTML content generator.
   * `raw` tag to pass through an interpolation any kind of content, even partial layout
   * `html` tag to define any simple to complex layout, with a `.min()` method to produce minified HTML content ([html-minifier based](https://www.npmjs.com/package/html-minifier))
 
+`css`, `js`, and `raw` tags can be used as regular function as long as the passed value is a single string. This makes creating once some raw content, or minified JS/CSS, easy to re-pass around:
+
+```js
+const alreadyAString = js`some code to minify`.min();
+
+// this works, but it doesn't look super nice
+html`<head>${raw`${alreadyAString}`}</head>`;
+
+// you can use the function form, instead of tag
+html`<head>${raw(alreadyAString)}</head>`;
+```
+
 All tags return a specialized `instanceof String`. If used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
 
 By default, all interpolated *content* is escaped, unless it was passed via `raw`.

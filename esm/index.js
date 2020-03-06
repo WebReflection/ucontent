@@ -2,10 +2,17 @@ import {CSS, JS, HTML, Raw} from './classes.js';
 import {join, parse} from './utils.js';
 
 const cache = new WeakMap;
+const define = Class => (template, ...values) => new Class(
+  typeof template === 'string' ? template : join(template, values)
+);
 
-export const css = (template, ...values) => new CSS(join(template, values));
+export const css = define(CSS);
+export const js = define(JS);
+export const raw = define(Raw);
 
-export const js = (template, ...values) => new JS(join(template, values));
+// this has no meaning here, but it's a "nice to have" in case a library uses
+// html, and svg functions passed along so that it works with µhtml or others
+export const svg = (template, ...values) => html(template, ...values);
 
 export const html = (template, ...values) => {
   const {length} = values;
@@ -16,12 +23,6 @@ export const html = (template, ...values) => {
       updates[0]()
   );
 };
-
-export const raw = (template, ...values) => new Raw(join(template, values));
-
-// this has no meaning here, but it's a "nice to have" in case a library uses
-// html, and svg functions passed along so that it works with µhtml or others
-export const svg = (template, ...values) => html(template, ...values);
 
 function update(value, i) {
   return this[i](value);
