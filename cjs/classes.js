@@ -3,10 +3,16 @@ const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
 
-const minifyCSS = css => csso.minify(css).css;
-class CSS extends String { min() { return minifyCSS(this.toString()); } }
+// the CSS chunk + min()
+class CSS extends String {
+  min() {
+    return csso.minify(this.toString()).css;
+  }
+}
 exports.CSS = CSS;
 
+
+// the HTML chunk + min()
 const htmlOptions = {
   collapseWhitespace: true,
   html5: true,
@@ -15,19 +21,34 @@ const htmlOptions = {
   removeAttributeQuotes: true,
   removeComments: true
 };
-const minifyHTML = content => html.minify(content, htmlOptions);
-class HTML extends String { min() { return minifyHTML(this.toString()); } }
+
+class HTML extends String {
+  min() {
+    return html.minify(this.toString(), htmlOptions);
+  }
+}
 exports.HTML = HTML;
 
+
+// the JS chunk + min()
 const jsOptions = {
   output: {
     comments: /^!/
   }
 };
-const minifyJS = js => uglify.minify(js, jsOptions).code;
-class JS extends String { min() { return minifyJS(this.toString()); } }
+
+class JS extends String {
+  min() {
+    return uglify.minify(this.toString(), jsOptions).code;
+  }
+}
 exports.JS = JS;
 
-// expose `.min()` but do nothing with it
-class Raw extends String { min() { return this.toString(); } }
+
+// the Raw chunk + min() as toString()
+class Raw extends String {
+  min() {
+    return this.toString();
+  }
+}
 exports.Raw = Raw;

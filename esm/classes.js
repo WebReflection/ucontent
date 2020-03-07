@@ -2,9 +2,15 @@ import csso from 'csso';
 import html from 'html-minifier';
 import uglify from 'uglify-es';
 
-const minifyCSS = css => csso.minify(css).css;
-export class CSS extends String { min() { return minifyCSS(this.toString()); } };
+// the CSS chunk + min()
+export class CSS extends String {
+  min() {
+    return csso.minify(this.toString()).css;
+  }
+};
 
+
+// the HTML chunk + min()
 const htmlOptions = {
   collapseWhitespace: true,
   html5: true,
@@ -13,16 +19,31 @@ const htmlOptions = {
   removeAttributeQuotes: true,
   removeComments: true
 };
-const minifyHTML = content => html.minify(content, htmlOptions);
-export class HTML extends String { min() { return minifyHTML(this.toString()); } };
 
+export class HTML extends String {
+  min() {
+    return html.minify(this.toString(), htmlOptions);
+  }
+};
+
+
+// the JS chunk + min()
 const jsOptions = {
   output: {
     comments: /^!/
   }
 };
-const minifyJS = js => uglify.minify(js, jsOptions).code;
-export class JS extends String { min() { return minifyJS(this.toString()); } };
 
-// expose `.min()` but do nothing with it
-export class Raw extends String { min() { return this.toString(); } };
+export class JS extends String {
+  min() {
+    return uglify.minify(this.toString(), jsOptions).code;
+  }
+};
+
+
+// the Raw chunk + min() as toString()
+export class Raw extends String {
+  min() {
+    return this.toString();
+  }
+};
