@@ -50,6 +50,41 @@ The same goes for `css` in case you'd like to inline minified `style=${...}` att
 Bear in mind both `js` and `css` minification can be expensive, and this module doesn't know anything about JS or CSS until you explicitly opt in.
 
 
+## How To Test
+
+Create a `test.js` file in any folder you like, then `npm i ucontent` in that very same folder.
+
+Write the following in the `test.js` file and save it:
+
+```js
+const {html} = require('ucontent');
+
+require('http').createServer((req, res) => {
+  res.writeHead(200, {'content-type': 'text/html;charset=utf-8'});
+  res.end(html`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>ucontent</title>
+    </head>
+    <body>${html`
+      <h1>Hello There</h1>
+      <p>
+        Thank you for visiting uhtml at ${new Date()}
+      </p>
+    `}</body>
+    </html>`.min()
+  );
+}).listen(8080);
+```
+
+You can now `node test.js` and reach [localhost:8080](http://localhost:8080/), to see the page layout generated.
+
+Bear in mind, the only tag that needs to explicitly invoke `.toString()` or `.min()` is the outer one, so that you should never use `.min()` within interpolations, otherwise that will be handled just as string, hence escaped before landing.
+
+
 #### API Summary Example
 
 ```js
