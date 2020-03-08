@@ -1,17 +1,14 @@
 'use strict';
-const {CSS, JS, HTML, Raw} = require('./classes.js');
-const {join, parse} = require('./utils.js');
+const {CSS, JS, HTML, Raw} = require('./ucontent.js');
+const {parse} = require('./utils.js');
 
 const cache = new WeakMap;
-const define = Class => (template, ...values) => new Class(
-  typeof template === 'string' ? template : join(template, values)
-);
 
-const css = define(CSS);
+const css = CSS;
 exports.css = css;
-const js = define(JS);
+const js = JS;
 exports.js = js;
-const raw = define(Raw);
+const raw = Raw;
 exports.raw = raw;
 
 // this has no meaning here, but it's a "nice to have" in case a library uses
@@ -22,11 +19,7 @@ exports.svg = svg;
 const html = (template, ...values) => {
   const {length} = values;
   const updates = cache.get(template) || parse(cache, template, length);
-  return new HTML(
-    length ?
-      values.map(update, updates).join('') :
-      updates[0]()
-  );
+  return HTML(length ? values.map(update, updates).join('') : updates[0]());
 };
 exports.html = html;
 

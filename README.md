@@ -29,9 +29,9 @@ html`<head><script>${raw`${alreadyAString}`}</script></head>`;
 html`<head><script>${raw(alreadyAString)}</script></head>`;
 ```
 
-All tags return a specialized `instanceof String`. If used in the wild, remember to eventually use `.toString()` or `.min()`, if you want the value to be minified.
+All tags return an `instanceof Buffer` with an extra `.min()` method, which would return a minified version of the buffer string content, as string.
 
-By default, all interpolated *content* is escaped, unless it was passed via `raw`.
+By default, all interpolated _html_ *content* is escaped, unless it was passed via `raw`, or it was an _html_ kind of buffer itself.
 
 
 ### Attributes Logic
@@ -75,14 +75,23 @@ require('http').createServer((req, res) => {
         Thank you for visiting uhtml at ${new Date()}
       </p>
     `}</body>
-    </html>`.min()
+    </html>`
   );
 }).listen(8080);
 ```
 
 You can now `node test.js` and reach [localhost:8080](http://localhost:8080/), to see the page layout generated.
 
-Bear in mind, the only tag that needs to explicitly invoke `.toString()` or `.min()` is the outer one, so that you should never use `.min()` within interpolations, otherwise that will be handled just as string, hence escaped before landing.
+If you'd like to test the minified version of that output, invoke `.min()` after the closing `</html>` template tag:
+
+```js
+  res.end(html`
+    <!DOCTYPE html>
+    <html lang="en">
+      ... previous content ...
+    </html>`.min() // <= like this
+  );
+```
 
 
 #### API Summary Example

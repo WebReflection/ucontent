@@ -3,7 +3,7 @@ const {escape} = require('html-escaper');
 const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('hyphenizer'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
 
-const {CSS, JS, HTML, Raw} = require('./classes.js');
+const {minCSS, minJS, minHTML, minRaw} = require('./ucontent.js');
 
 const {keys} = Object;
 
@@ -16,35 +16,33 @@ const attribute = (name, quote, value) =>
                     ` ${name}=${quote}${escape(value)}${quote}`;
 
 const getValue = value => {
-  const type = typeof value;
-
-  // quick typeof check to escape by default
-  if (type === 'string')
-    return escape(value);
-
-  // pass along boolean and numbers as string
-  // pass through HTML and Raw instances
-  if (
-    type === 'boolean' || type === 'number' ||
-    value instanceof HTML || value instanceof Raw
-  )
-    return value.toString();
-
-  // allow Array as interpolation
-  if (value instanceof Array)
-    return value.map(getValue).join('');
-
-  // minify CSS or JS
-  if (value instanceof CSS || value instanceof JS)
-    return value.min();
-
-  // last fallback: escape whatever it is
+  // why is istanbul bothering me here? all cases covered
+  /* istanbul ignore next */
+  switch (typeof value) {
+    case 'string':
+      value = escape(value);
+    case 'number':
+    case 'boolean':
+      return value;
+    case 'object':
+      if (value instanceof Buffer) {
+        switch (value.min) {
+          case minHTML:
+          case minRaw:
+            return value;
+          case minCSS:
+          case minJS:
+            return value.min();
+        }
+        return escape(value.toString());
+      }
+      if (value instanceof Array)
+        return value.map(getValue).join('');
+      if (value == null)
+        return '';
+  }
   return escape(String(value));
 };
-
-// exports
-const join = (tpl, val) => tpl[0] + val.map(chunks, tpl).join('');
-exports.join = join;
 
 const parse = (cache, template, expectedLength) => {
   const html = instrument(template, prefix).trim();
@@ -124,10 +122,6 @@ function aria(key) {
   return key === 'role' ?
           ` role="${value}"` :
           ` aria-${hyphenizer(key)}="${value}"`;
-}
-
-function chunks(value, i) {
-  return value + this[i + 1];
 }
 
 function data(key) {

@@ -3,8 +3,13 @@ const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
 
+const {setPrototypeOf} = Object;
+
 // the CSS chunk + min()
-class CSS extends String {
+class CSS extends Buffer {
+  constructor(content) {
+    return setPrototypeOf(Buffer.from(content), CSS.prototype);
+  }
   min() {
     return csso.minify(this.toString()).css;
   }
@@ -22,7 +27,10 @@ const htmlOptions = {
   removeComments: true
 };
 
-class HTML extends String {
+class HTML extends Buffer {
+  constructor(content) {
+    return setPrototypeOf(Buffer.from(content), HTML.prototype);
+  }
   min() {
     return html.minify(this.toString(), htmlOptions);
   }
@@ -37,7 +45,10 @@ const jsOptions = {
   }
 };
 
-class JS extends String {
+class JS extends Buffer {
+  constructor(content) {
+    return setPrototypeOf(Buffer.from(content), JS.prototype);
+  }
   min() {
     return uglify.minify(this.toString(), jsOptions).code;
   }
@@ -46,7 +57,10 @@ exports.JS = JS;
 
 
 // the Raw chunk + min() as toString()
-class Raw extends String {
+class Raw extends Buffer {
+  constructor(content) {
+    return setPrototypeOf(Buffer.from(content), Raw.prototype);
+  }
   min() {
     return this.toString();
   }

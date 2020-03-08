@@ -13,6 +13,8 @@ assert(html`<div .contentEditable=${true}/>`, '<div contenteditable></div>');
 assert(html`<div .whatever=${''}/>`, '<div whatever=""></div>');
 assert(html`<div escaped=${'"'}/>`, '<div escaped="&quot;"></div>');
 assert(html`<div escaped=${null}/>`, '<div></div>');
+assert(html`<div>${Buffer.from('"')}</div>`, '<div>&quot;</div>');
+assert(html`<div>${new String('"')}</div>`, '<div>&quot;</div>');
 assert(html`<div data=${{no:1, withHyphens:2}}/>`, '<div data-no="1" data-with-hyphens="2"></div>');
 assert(html`<div aria=${{role: 'button', labelledby: 'id'}}/>`, '<div role="button" aria-labelledby="id"></div>');
 assert(html`<div>${[1,2].map(n => html`<p>${n}</p>`)}</div>`, '<div><p>1</p><p>2</p></div>');
