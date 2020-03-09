@@ -20,6 +20,8 @@ assert(html`<div aria=${{role: 'button', labelledby: 'id'}}/>`, '<div role="butt
 assert(html`<div>${[1,2].map(n => html`<p>${n}</p>`)}</div>`, '<div><p>1</p><p>2</p></div>');
 assert(html`<div>${[1,2].map(n => `<p>${n}</p>`)}</div>`, '<div>&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;</div>');
 assert(html`<div>${{}}</div>`, '<div>[object Object]</div>');
+assert(html`<div>${null}</div>`, '<div></div>');
+assert(html`<div>${void 0}</div>`, '<div></div>');
 
 assert(html`<script>${js`function test() { console.log(1); }`}</script>`, '<script>function test(){console.log(1)}</script>');
 assert(html`<style>${css`body { font-family: sans-serif; }`}</style>`, '<style>body{font-family:sans-serif}</style>');

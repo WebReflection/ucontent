@@ -15,8 +15,6 @@ const attribute = (name, quote, value) =>
                     ` ${name}=${quote}${escape(value)}${quote}`;
 
 const getValue = value => {
-  // why is istanbul bothering me here? all cases covered
-  /* istanbul ignore next */
   switch (typeof value) {
     case 'string':
       value = escape(value);
@@ -37,10 +35,8 @@ const getValue = value => {
       }
       if (value instanceof Array)
         return value.map(getValue).join('');
-      if (value == null)
-        return '';
   }
-  return escape(String(value));
+  return value == null ? '' : escape(String(value));
 };
 
 export const parse = (cache, template, expectedLength) => {
