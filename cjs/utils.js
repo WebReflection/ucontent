@@ -3,9 +3,11 @@ const {escape} = require('html-escaper');
 const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('hyphenizer'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
 
-const {minCSS, minJS, minHTML, minRaw} = require('./ucontent.js');
+const {CSS, HTML, JS, Raw} = require('./ucontent.js');
 
 const {keys} = Object;
+
+const inlineStyle = new WeakMap;
 
 const prefix = 'isµ' + Date.now();
 const interpolation = new RegExp(
@@ -23,19 +25,16 @@ const getValue = value => {
     case 'boolean':
       return value;
     case 'object':
-      if (value instanceof Buffer) {
-        switch (value.min) {
-          case minHTML:
-          case minRaw:
-            return value;
-          case minCSS:
-          case minJS:
-            return value.min();
-        }
-        return escape(value.toString());
+      switch (true) {
+        case value instanceof Array:
+          return value.map(getValue).join('');
+        case value instanceof HTML:
+        case value instanceof Raw:
+          return value;
+        case value instanceof CSS:
+        case value instanceof JS:
+          return value.min();
       }
-      if (value instanceof Array)
-        return value.map(getValue).join('');
   }
   return value == null ? '' : escape(String(value));
 };
@@ -54,11 +53,28 @@ const parse = (cache, template, expectedLength) => {
       const name = match[5];
       const quote = match[4];
       switch (true) {
+        case name === 'aria':
+          updates.push(value => (pre + keys(value).map(aria, value).join('')));
+          break;
         case name === 'data':
           updates.push(value => (pre + keys(value).map(data, value).join('')));
           break;
-        case name === 'aria':
-          updates.push(value => (pre + keys(value).map(aria, value).join('')));
+        case name === 'style':
+          updates.push(value => {
+            let result = pre;
+            if (typeof value === 'string')
+              result += attribute(name, quote, value);
+            if (value instanceof CSS) {
+              if (!inlineStyle.has(value)) {
+                inlineStyle.set(
+                  value,
+                  new CSS(`style{${value}}`).min().slice(6, -1)
+                );
+              }
+              result += attribute(name, quote, inlineStyle.get(value));
+            }
+            return result;
+          });
           break;
         // setters as boolean attributes (.disabled .contentEditable)
         case name[0] === '.':
@@ -81,8 +97,11 @@ const parse = (cache, template, expectedLength) => {
           updates.push(value => {
             let result = pre;
             // allow listeners only if passed as string
+            // or as instance of JS
             if (typeof value === 'string')
               result += attribute(name, quote, value);
+            else if (value instanceof JS)
+              result += attribute(name, quote, value.min());
             return result;
           });
           break;

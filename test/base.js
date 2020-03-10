@@ -1,8 +1,8 @@
-const {html} = require('../cjs');
+const {render, html} = require('../cjs');
 
 require('http').createServer((req, res) => {
   res.writeHead(200, {'content-type': 'text/html;charset=utf-8'});
-  res.end(html`
+  render(content => res.end(content), html`
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -16,7 +16,8 @@ require('http').createServer((req, res) => {
         Thank you for visiting uhtml at ${new Date()}
       </p>
     `}</body>
-    </html>`.min()
+    </html>
+    `.min()
   );
 }).listen(8080);
 
