@@ -12,56 +12,90 @@ A <em>micro</em> **SSR** oriented HTML content generator, but if you are looking
 
 ## API
 
-  * `css` tag to explicitly minify CSS within an interpolation ([csso based](https://www.npmjs.com/package/csso))
-  * `js` tag to explicitly minify JS within an interpolation ([uglify-es based](https://www.npmjs.com/package/uglify-es))
-  * `raw` tag to pass through an interpolation any kind of content, even partial layout
-  * `html` tag to define any simple to complex layout, with a `.min()` method to produce minified HTML content ([html-minifier based](https://www.npmjs.com/package/html-minifier))
+  * a `render(where, what)` function, to render in a `response` object, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response`)
+  * a `html` tag, to render _HTML_ content. Each interpolation passed as layout content, can be either a result from `html`, `css`, `js`, or `raw` tag, as well as primitives, such as `string`, `boolean`, `number`, or even `null` or `undefined`. The result is a specialized instance of `String` with a `.min()` method to produce eventually minified _HTML_ content via [html-minifier](https://www.npmjs.com/package/html-minifier). All layout content, if not specialized, will be safely escaped, while attributes will always be escaped to avoid layout malfunctions.
+  * a `css` tag, to create _CSS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _CSS_ content via [csso](https://www.npmjs.com/package/csso). If passed as `html` tag interpolation content, `.min()` will be automatically invoked.
+  * a `js` tag, to create _JS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _JS_ content via [uglify-es](https://www.npmjs.com/package/uglify-es). If passed as `html` tag interpolation content, `.min()` will be automatically invoked.
+  * a `raw` tag, to pass along interpolated _HTML_ values any kind of content, even partial one, or a broken, layout.
 
-`css`, `js`, and `raw` tags can be used as regular function as long as the passed value is a single string. This makes creating once some raw content, or minified JS/CSS, easy to re-pass around:
+Except for the `html` tag, all other tags can be used as regular functions, as long as the passed value is a string, or a specialized instance.
+
+This allow content to be retrieved a part and then be used as is within these tags.
 
 ```js
-const alreadyAString = js`some code to minify`.min();
+const code = js(require('fs').readFileSync('./code.js'));
+const style = css(require('fs').readFileSync('./style.css'));
+const partial = raw(require('fs').readFileSync('./partial.html'));
 
-// this works, but it doesn't look super nice
-html`<head><script>${raw`${alreadyAString}`}</script></head>`;
+const head = title => html`
+  <head>
+    <title>${title}</title>
+    <style>${style}</style>
+    <script>${code}</script>
+  </head>
+`;
 
-// you can use the function form, instead of tag
-html`<head><script>${raw(alreadyAString)}</script></head>`;
+const body = () => html`<body>${partial}</body>`;
+
+const page = title => html`
+  <!doctype html>
+  <html>
+    ${head(title)}
+    ${body()}
+  </html>
+`;
 ```
 
-All tags return an `instanceof Buffer` with an extra `.min()` method, which would return a minified version of the buffer string content, as string.
+Including `html`, all pre-generated content can be passed along, automatically avoiding minification of the same content per each request.
 
-By default, all interpolated _html_ *content* is escaped, unless it was passed via `raw`, or it was an _html_ kind of buffer itself.
+```js
+// will be re-used and minified only once
+const jsContent = js`/* same JS code to serve */`;
+const cssContent = css`/* same CSS content to serve */`;
+
+require('http')
+  .createServer((request, response) => {
+    render(response, html`
+      <!doctype html>
+      <html>
+        <head>
+          <title>µcontent</title>
+          <style>${cssContent}</style>
+          <script>${jsContent}</script>
+        </head>
+      </html>
+    `.min());
+  })
+  .listen(8080);
+```
+
+If one of the _HTML_ interpolations is `null` or `undefined`, an empty string will be used instead.
 
 
-### Attributes Logic
+## Attributes Logic
 
   * all attributes are escaped by default
   * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout
-  * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
+  * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
+  * `style=${css...}` attributes are minified, if the value is the result of a `css` tag
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
   * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout
-  * `on...=${'...'}` events passed as strings will be preserved.
-  
-You could use the `js` tag to minified on the fly JS in attributes, but remember to pass it via `.min()`.
-The same goes for `css` in case you'd like to inline minified `style=${...}` attributes.
-
-Bear in mind both `js` and `css` minification can be expensive, and this module doesn't know anything about JS or CSS until you explicitly opt in.
+  * `on...=${'...'}` events passed as string though, or as result of a `js` tag, will be preserved, and in latter case, minified.
 
 
-## How To Test
+### How To Test
 
 Create a `test.js` file in any folder you like, then `npm i ucontent` in that very same folder.
 
 Write the following in the `test.js` file and save it:
 
 ```js
-const {html} = require('ucontent');
+const {render, html} = require('ucontent');
 
 require('http').createServer((req, res) => {
   res.writeHead(200, {'content-type': 'text/html;charset=utf-8'});
-  res.end(html`
+  render(res, html`
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -75,8 +109,9 @@ require('http').createServer((req, res) => {
         Thank you for visiting uhtml at ${new Date()}
       </p>
     `}</body>
-    </html>`
-  );
+    </html>
+  `)
+  .end();
 }).listen(8080);
 ```
 
@@ -85,21 +120,22 @@ You can now `node test.js` and reach [localhost:8080](http://localhost:8080/), t
 If you'd like to test the minified version of that output, invoke `.min()` after the closing `</html>` template tag:
 
 ```js
-  res.end(html`
+  render(res, html`
     <!DOCTYPE html>
     <html lang="en">
-      ... previous content ...
-    </html>`.min() // <= like this
-  );
+      ...
+    </html>
+  `.min()
+  ).end();
 ```
 
 
 #### API Summary Example
 
 ```js
-import {css, js, html, raw} from 'ucontent';
+import {render, css, js, html, raw} from 'ucontent';
 
-response.write(html`
+render(content => response.end(content), html`
 <!doctype html>
 <html lang=${user.lang}>
   <head>
@@ -134,6 +170,5 @@ response.write(html`
     </div>
   </body>
 </html>
-`.min() // optional HTML minifier included
-);
+`.min());
 ```

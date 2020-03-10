@@ -3,32 +3,6 @@ const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
 
-function chunks(value, i) {
-  return value + this[i + 1];
-}
-
-const createTag = min => (template, ...values) => {
-  const buf = Buffer.from(
-    typeof template === 'string' ?
-      template :
-      join(template, values),
-    'utf-8'
-  );
-  buf.min = min;
-  return buf;
-};
-
-const join = (tpl, val) => tpl[0] + val.map(chunks, tpl).join('');
-
-// The CSS Tag
-const CSS = createTag(minCSS);
-exports.CSS = CSS;
-function minCSS() {
-  return csso.minify(this.toString()).css;
-}
-exports.minCSS = minCSS;
-
-// The HTML Tag
 const htmlOptions = {
   collapseWhitespace: true,
   html5: true,
@@ -37,30 +11,87 @@ const htmlOptions = {
   removeAttributeQuotes: true,
   removeComments: true
 };
-const HTML = createTag(minHTML);
-exports.HTML = HTML;
-function minHTML() {
-  return html.minify(this.toString(), htmlOptions);
-}
-exports.minHTML = minHTML;
 
-// The JS Tag
 const jsOptions = {
   output: {
     comments: /^!/
   }
 };
-const JS = createTag(minJS);
-exports.JS = JS;
-function minJS() {
-  return uglify.minify(this.toString(), jsOptions).code;
-}
-exports.minJS = minJS;
 
-// The Raw Tag
-const Raw = createTag(minRaw);
-exports.Raw = Raw;
-function minRaw() {
-  return this.toString();
+/**
+ * The base class for CSS, HTML, JS, and Raw.
+ * @private
+ */
+class UContent extends String {
+  /**
+   * 
+   * @param {string} content The string representing some content.
+   * @param {boolean} minified The optional flag to avoid duplicated `.min()`.
+   */
+  constructor(content, minified = false) {
+    super(content).minified = minified;
+  }
 }
-exports.minRaw = minRaw;
+exports.UContent = UContent;
+
+
+/**
+ * The class that represents CSS content.
+ */
+class CSS extends UContent {
+  /**
+   * @returns {string} The CSS content as minified.
+   */
+  min() {
+    return this.minified ?
+            this :
+            new CSS(csso.minify(this.toString()).css, true);
+  }
+}
+exports.CSS = CSS;
+
+
+/**
+ * The class that represents HTML content.
+ */
+class HTML extends UContent {
+  /**
+   * @returns {string} The HTML content as minified.
+   */
+  min() {
+    return this.minified ?
+            this :
+            new HTML(html.minify(this.toString(), htmlOptions), true);
+  }
+}
+exports.HTML = HTML;
+
+
+/**
+ * The class that represents JS content.
+ */
+class JS extends UContent {
+  /**
+   * @returns {string} The JS content as minified.
+   */
+  min() {
+    return this.minified ?
+            this :
+            new JS(uglify.minify(this.toString(), jsOptions).code, true);
+  }
+}
+exports.JS = JS;
+
+
+/**
+ * The class that represents Raw content.
+ */
+class Raw extends UContent {
+  /**
+   * @returns {string} The Raw content as is.
+   */
+  min() {
+    return this;
+  }
+}
+exports.Raw = Raw;

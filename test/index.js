@@ -1,4 +1,4 @@
-const {css, js, html, raw, svg} = require('../cjs');
+const {render, css, js, html, raw, svg} = require('../cjs');
 
 const assert = (ucontent, output) => {
   console.assert(ucontent == output, ucontent.toString());
@@ -23,16 +23,34 @@ assert(html`<div>${{}}</div>`, '<div>[object Object]</div>');
 assert(html`<div>${null}</div>`, '<div></div>');
 assert(html`<div>${void 0}</div>`, '<div></div>');
 
-assert(html`<script>${js`function test() { console.log(1); }`}</script>`, '<script>function test(){console.log(1)}</script>');
-assert(html`<style>${css`body { font-family: sans-serif; }`}</style>`, '<style>body{font-family:sans-serif}</style>');
-assert(html`<div>${raw`<bro"ken />`.min()}</div>`, '<div>&lt;bro&quot;ken /&gt;</div>');
+assert(html`<script>${js`function test() { console.log(1); }`.min().min()}</script>`, '<script>function test(){console.log(1)}</script>');
+assert(html`<style>${css`body { font-family: sans-serif; }`.min().min()}</style>`, '<style>body{font-family:sans-serif}</style>');
+assert(html`<div>${raw`<bro"ken />`.min().min()}</div>`, '<div><bro"ken /></div>');
 assert(html`<div>${raw`<bro"ken ${2} />`}</div>`, '<div><bro"ken 2 /></div>');
 assert(html`<div>${raw('<bro"ken />')}</div>`, '<div><bro"ken /></div>');
-assert(html`<div  test="${true}"></div>`.min(), '<div test=true></div>');
+assert(html`<div  test="${true}"></div>`.min().min(), '<div test=true></div>');
 assert(html`<div  test="${123}"></div>`.min(), '<div test=123></div>');
+assert(html`<div onclick="${js`alert(1)`}"></div>`.min(), '<div onclick=alert(1);></div>');
+const inlineStyle = css`font-family: sans-serif`;
+assert(html`<div style="${inlineStyle}"></div>`, '<div style="font-family:sans-serif"></div>');
+assert(html`<div style="${inlineStyle}"></div>`, '<div style="font-family:sans-serif"></div>');
+assert(html`<div style="${'font-family: sans-serif'}"></div>`, '<div style="font-family: sans-serif"></div>');
 
 try {
   html(['', '']);
   console.assert(false, 'not throwing with bad template');
 }
 catch (e) {}
+
+let outerContent = '';
+const callback = content => (outerContent = content);
+const server = {write(content) { this.content = content; }};
+
+assert(render(callback, html`<p />`), outerContent);
+assert(outerContent, '<p></p>');
+
+render(server, html`<p />`);
+assert(server.content, '<p></p>');
+
+assert(render(server, () => html`<div />`), server);
+assert(server.content, '<div></div>');
