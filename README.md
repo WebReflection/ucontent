@@ -75,7 +75,8 @@ If one of the _HTML_ interpolations is `null` or `undefined`, an empty string wi
 
 ## Attributes Logic
 
-  * all attributes are escaped by default
+  * as it is for _µhtml_ too, sparse attributes are not supported. This is ok `attr=${value}` but this is wrong: `attr="${x} and ${y}"`.
+  * all attributes are safely escaped by default.
   * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
