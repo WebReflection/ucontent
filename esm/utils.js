@@ -1,12 +1,13 @@
 import {escape} from 'html-escaper';
 import hyphenizer from 'hyphenizer';
 import instrument from 'uparser';
+import umap from 'umap';
 
 import {CSS, HTML, JS, Raw} from './ucontent.js';
 
 const {keys} = Object;
 
-const inlineStyle = new WeakMap;
+const inlineStyle = umap(new WeakMap);
 
 const prefix = 'isµ' + Date.now();
 const interpolation = new RegExp(
@@ -38,7 +39,7 @@ const getValue = value => {
   return value == null ? '' : escape(String(value));
 };
 
-export const parse = (cache, template, expectedLength) => {
+export const parse = (template, expectedLength) => {
   const html = instrument(template, prefix).trim();
   const updates = [];
   let i = 0;
@@ -64,13 +65,15 @@ export const parse = (cache, template, expectedLength) => {
             if (typeof value === 'string')
               result += attribute(name, quote, value);
             if (value instanceof CSS) {
-              if (!inlineStyle.has(value)) {
+              result += attribute(
+                name,
+                quote,
+                inlineStyle.get(value) ||
                 inlineStyle.set(
                   value,
                   new CSS(`style{${value}}`).min().slice(6, -1)
-                );
-              }
-              result += attribute(name, quote, inlineStyle.get(value));
+                )
+              );
             }
             return result;
           });
@@ -125,7 +128,6 @@ export const parse = (cache, template, expectedLength) => {
   }
   else
     updates.push(() => html);
-  cache.set(template, updates);
   return updates;
 };
 

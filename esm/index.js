@@ -1,7 +1,8 @@
+import umap from 'umap';
 import {CSS, HTML, JS, Raw, UContent} from './ucontent.js';
 import {parse} from './utils.js';
 
-const cache = new WeakMap;
+const cache = umap(new WeakMap);
 
 const join = (template, values) => (
   template[0] + values.map(chunks, template).join('')
@@ -55,7 +56,8 @@ export const raw = (template, ...values) => new Raw(
  */
 export const html = (template, ...values) => {
   const {length} = values;
-  const updates = cache.get(template) || parse(cache, template, length);
+  const updates = cache.get(template) ||
+                  cache.set(template, parse(template, length));
   return new HTML(
     length ? values.map(update, updates).join('') : updates[0]()
   );

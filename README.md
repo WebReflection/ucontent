@@ -106,7 +106,7 @@ require('http').createServer((req, res) => {
     <body>${html`
       <h1>Hello There</h1>
       <p>
-        Thank you for visiting uhtml at ${new Date()}
+        Thank you for trying µcontent at ${new Date()}
       </p>
     `}</body>
     </html>

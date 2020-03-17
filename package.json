@@ -29,6 +29,7 @@
     "html-minifier": "^4.0.0",
     "hyphenizer": "^0.1.1",
     "uglify-es": "^3.3.9",
+    "umap": "^1.0.2",
     "uparser": "^0.1.0"
   },
   "repository": {

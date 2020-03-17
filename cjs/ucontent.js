@@ -6,7 +6,6 @@ const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* is
 const htmlOptions = {
   collapseWhitespace: true,
   html5: true,
-  keepClosingSlash: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: true,
   removeComments: true
@@ -26,7 +25,7 @@ class UContent extends String {
   /**
    * 
    * @param {string} content The string representing some content.
-   * @param {boolean} minified The optional flag to avoid duplicated `.min()`.
+   * @param {boolean} [minified] The optional flag to avoid duplicated `min()`.
    */
   constructor(content, minified = false) {
     super(content).minified = minified;
@@ -40,7 +39,7 @@ exports.UContent = UContent;
  */
 class CSS extends UContent {
   /**
-   * @returns {string} The CSS content as minified.
+   * @returns {CSS} The CSS instance as minified.
    */
   min() {
     return this.minified ?
@@ -56,7 +55,7 @@ exports.CSS = CSS;
  */
 class HTML extends UContent {
   /**
-   * @returns {string} The HTML content as minified.
+   * @returns {HTML} The HTML instance as minified.
    */
   min() {
     return this.minified ?
@@ -72,7 +71,7 @@ exports.HTML = HTML;
  */
 class JS extends UContent {
   /**
-   * @returns {string} The JS content as minified.
+   * @returns {JS} The JS instance as minified.
    */
   min() {
     return this.minified ?
@@ -88,7 +87,7 @@ exports.JS = JS;
  */
 class Raw extends UContent {
   /**
-   * @returns {string} The Raw content as is.
+   * @returns {Raw} The Raw content as is.
    */
   min() {
     return this;

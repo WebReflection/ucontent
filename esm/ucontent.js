@@ -5,7 +5,6 @@ import uglify from 'uglify-es';
 const htmlOptions = {
   collapseWhitespace: true,
   html5: true,
-  keepClosingSlash: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: true,
   removeComments: true
@@ -25,7 +24,7 @@ export class UContent extends String {
   /**
    * 
    * @param {string} content The string representing some content.
-   * @param {boolean} minified The optional flag to avoid duplicated `.min()`.
+   * @param {boolean} [minified] The optional flag to avoid duplicated `min()`.
    */
   constructor(content, minified = false) {
     super(content).minified = minified;
@@ -38,7 +37,7 @@ export class UContent extends String {
  */
 export class CSS extends UContent {
   /**
-   * @returns {string} The CSS content as minified.
+   * @returns {CSS} The CSS instance as minified.
    */
   min() {
     return this.minified ?
@@ -53,7 +52,7 @@ export class CSS extends UContent {
  */
 export class HTML extends UContent {
   /**
-   * @returns {string} The HTML content as minified.
+   * @returns {HTML} The HTML instance as minified.
    */
   min() {
     return this.minified ?
@@ -68,7 +67,7 @@ export class HTML extends UContent {
  */
 export class JS extends UContent {
   /**
-   * @returns {string} The JS content as minified.
+   * @returns {JS} The JS instance as minified.
    */
   min() {
     return this.minified ?
@@ -83,7 +82,7 @@ export class JS extends UContent {
  */
 export class Raw extends UContent {
   /**
-   * @returns {string} The Raw content as is.
+   * @returns {Raw} The Raw content as is.
    */
   min() {
     return this;

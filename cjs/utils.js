@@ -2,12 +2,13 @@
 const {escape} = require('html-escaper');
 const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('hyphenizer'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
+const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
 const {CSS, HTML, JS, Raw} = require('./ucontent.js');
 
 const {keys} = Object;
 
-const inlineStyle = new WeakMap;
+const inlineStyle = umap(new WeakMap);
 
 const prefix = 'isµ' + Date.now();
 const interpolation = new RegExp(
@@ -39,7 +40,7 @@ const getValue = value => {
   return value == null ? '' : escape(String(value));
 };
 
-const parse = (cache, template, expectedLength) => {
+const parse = (template, expectedLength) => {
   const html = instrument(template, prefix).trim();
   const updates = [];
   let i = 0;
@@ -65,13 +66,15 @@ const parse = (cache, template, expectedLength) => {
             if (typeof value === 'string')
               result += attribute(name, quote, value);
             if (value instanceof CSS) {
-              if (!inlineStyle.has(value)) {
+              result += attribute(
+                name,
+                quote,
+                inlineStyle.get(value) ||
                 inlineStyle.set(
                   value,
                   new CSS(`style{${value}}`).min().slice(6, -1)
-                );
-              }
-              result += attribute(name, quote, inlineStyle.get(value));
+                )
+              );
             }
             return result;
           });
@@ -126,7 +129,6 @@ const parse = (cache, template, expectedLength) => {
   }
   else
     updates.push(() => html);
-  cache.set(template, updates);
   return updates;
 };
 exports.parse = parse;
