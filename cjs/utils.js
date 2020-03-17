@@ -4,7 +4,7 @@ const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
-const {CSS, HTML, JS, Raw} = require('./ucontent.js');
+const {CSS, HTML, JS, Raw, SVG} = require('./ucontent.js');
 
 const {keys} = Object;
 
@@ -21,27 +21,28 @@ const attribute = (name, quote, value) =>
 const getValue = value => {
   switch (typeof value) {
     case 'string':
-      value = escape(value);
-    case 'number':
+      return escape(value);
     case 'boolean':
-      return value;
+    case 'number':
+      return String(value);
     case 'object':
       switch (true) {
         case value instanceof Array:
           return value.map(getValue).join('');
         case value instanceof HTML:
         case value instanceof Raw:
-          return value;
+          return value.toString();
         case value instanceof CSS:
         case value instanceof JS:
-          return value.min();
+        case value instanceof SVG:
+          return value.min().toString();
       }
   }
   return value == null ? '' : escape(String(value));
 };
 
-const parse = (template, expectedLength) => {
-  const html = instrument(template, prefix).trim();
+const parse = (template, expectedLength, svg) => {
+  const html = instrument(template, prefix, svg).trim();
   const updates = [];
   let i = 0;
   let match = null;

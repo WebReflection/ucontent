@@ -7,18 +7,19 @@
 <sup>**Social Media Photo by [Bonnie Kittle](https://unsplash.com/@bonniekdesign) on [Unsplash](https://unsplash.com/)**</sup>
 
 
-A <em>micro</em> **SSR** oriented HTML content generator, but if you are looking for a <em>micro</em> **FE** content generator, check _[µhtml](https://github.com/WebReflection/uhtml#readme)_ out.
+A <em>micro</em> **SSR** oriented HTML/SVG content generator, but if you are looking for a <em>micro</em> **FE** content generator, check _[µhtml](https://github.com/WebReflection/uhtml#readme)_ out.
 
 
 ## API
 
   * a `render(where, what)` utility, to render in a `response` object, via `response.write(content)`, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response`). Please note this function is not mandatory to render content, as any content is an instance of `String`, so that if you prefer to render it regularly, you can always use directly `content.toString()` instead.
-  * a `html` tag, to render _HTML_ content. Each interpolation passed as layout content, can be either a result from `html`, `css`, `js`, or `raw` tag, as well as primitives, such as `string`, `boolean`, `number`, or even `null` or `undefined`. The result is a specialized instance of `String` with a `.min()` method to produce eventually minified _HTML_ content via [html-minifier](https://www.npmjs.com/package/html-minifier). All layout content, if not specialized, will be safely escaped, while attributes will always be escaped to avoid layout malfunctions.
-  * a `css` tag, to create _CSS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _CSS_ content via [csso](https://www.npmjs.com/package/csso). If passed as `html` tag interpolation content, `.min()` will be automatically invoked.
-  * a `js` tag, to create _JS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _JS_ content via [uglify-es](https://www.npmjs.com/package/uglify-es). If passed as `html` tag interpolation content, `.min()` will be automatically invoked.
-  * a `raw` tag, to pass along interpolated _HTML_ values any kind of content, even partial one, or a broken, layout.
+  * a `html` tag, to render _HTML_ content. Each interpolation passed as layout content, can be either a result from `html`, `css`, `js`, `svg`, or `raw` tag, as well as primitives, such as `string`, `boolean`, `number`, or even `null` or `undefined`. The result is a specialized instance of `String` with a `.min()` method to produce eventually minified _HTML_ content via [html-minifier](https://www.npmjs.com/package/html-minifier). All layout content, if not specialized, will be safely escaped, while attributes will always be escaped to avoid layout malfunctions.
+  * a `svg` tag, identical to the `html` one, except minification would preserve any self-closing tag, as in `<rect />`.
+  * a `css` tag, to create _CSS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _CSS_ content via [csso](https://www.npmjs.com/package/csso). If passed as `html` or `svg` tag interpolation content, `.min()` will be automatically invoked.
+  * a `js` tag, to create _JS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _JS_ content via [uglify-es](https://www.npmjs.com/package/uglify-es). If passed as `html` or `svg` tag interpolation content, `.min()` will be automatically invoked.
+  * a `raw` tag, to pass along interpolated _HTML_ or _SVG_ values any kind of content, even partial one, or a broken, layout.
 
-Except for the `html` tag, all other tags can be used as regular functions, as long as the passed value is a string, or a specialized instance.
+Except for `html` and `svg` tags, all other tags can be used as regular functions, as long as the passed value is a string, or a specialized instance.
 
 This allow content to be retrieved a part and then be used as is within these tags.
 

@@ -7,12 +7,16 @@ const assert = (ucontent, output) => {
 assert(html`<div />`, '<div></div>');
 assert(html`<div onclick=${Object}/>`, '<div></div>');
 assert(html`<div onclick=${Object} onmouseover=${'callback(event)'}/>`, '<div onmouseover="callback(event)"></div>');
-assert(svg`<div .contentEditable=${null}/>`, '<div></div>');
+assert(svg`<div .contentEditable=${null} />`, '<div />');
 assert(html`<div .contentEditable=${false}/>`, '<div></div>');
 assert(html`<div .contentEditable=${true}/>`, '<div contenteditable></div>');
 assert(html`<div .whatever=${''}/>`, '<div whatever=""></div>');
 assert(html`<div escaped=${'"'}/>`, '<div escaped="&quot;"></div>');
 assert(html`<div escaped=${null}/>`, '<div></div>');
+const rect = svg`<rect />`;
+assert(html`<div>${rect}</div>`, '<div><rect/></div>');
+assert(html`<svg>${rect}</svg>`, '<svg><rect/></svg>');
+assert(html`<svg>${rect.min().min()}</svg>`, '<svg><rect/></svg>');
 assert(html`<div>${Buffer.from('"')}</div>`, '<div>&quot;</div>');
 assert(html`<div>${new String('"')}</div>`, '<div>&quot;</div>');
 assert(html`<div data=${{no:1, withHyphens:2}}/>`, '<div data-no="1" data-with-hyphens="2"></div>');
@@ -22,6 +26,8 @@ assert(html`<div>${[1,2].map(n => `<p>${n}</p>`)}</div>`, '<div>&lt;p&gt;1&lt;/p
 assert(html`<div>${{}}</div>`, '<div>[object Object]</div>');
 assert(html`<div>${null}</div>`, '<div></div>');
 assert(html`<div>${void 0}</div>`, '<div></div>');
+assert(html`<div>${true}</div>`, '<div>true</div>');
+assert(html`<div>${123}</div>`, '<div>123</div>');
 
 assert(html`<script>${js`function test() { console.log(1); }`.min().min()}</script>`, '<script>function test(){console.log(1)}</script>');
 assert(html`<style>${css`body { font-family: sans-serif; }`.min().min()}</style>`, '<style>body{font-family:sans-serif}</style>');

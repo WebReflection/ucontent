@@ -1,20 +1,25 @@
 import csso from 'csso';
 import html from 'html-minifier';
 import uglify from 'uglify-es';
+import umap from 'umap';
 
-const htmlOptions = {
+const {assign} = Object;
+
+const cache = umap(new WeakMap);
+
+const commonOptions = {
   collapseWhitespace: true,
-  html5: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: true,
   removeComments: true
 };
 
-const jsOptions = {
-  output: {
-    comments: /^!/
-  }
-};
+const htmlOptions = assign({html5: true}, commonOptions);
+
+const jsOptions = {output: {comments: /^!/}};
+
+const svgOptions = assign({keepClosingSlash: true}, commonOptions);
+
 
 /**
  * The base class for CSS, HTML, JS, and Raw.
@@ -40,9 +45,13 @@ export class CSS extends UContent {
    * @returns {CSS} The CSS instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new CSS(csso.minify(this.toString()).css, true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new CSS(csso.minify(this.toString()).css, true)
+      )
+    );
   }
 };
 
@@ -55,9 +64,13 @@ export class HTML extends UContent {
    * @returns {HTML} The HTML instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new HTML(html.minify(this.toString(), htmlOptions), true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new HTML(html.minify(this.toString(), htmlOptions), true)
+      )
+    );
   }
 };
 
@@ -70,9 +83,13 @@ export class JS extends UContent {
    * @returns {JS} The JS instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new JS(uglify.minify(this.toString(), jsOptions).code, true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new JS(uglify.minify(this.toString(), jsOptions).code, true)
+      )
+    );
   }
 };
 
@@ -86,5 +103,24 @@ export class Raw extends UContent {
    */
   min() {
     return this;
+  }
+};
+
+
+/**
+ * The class that represents SVG content.
+ */
+export class SVG extends UContent {
+  /**
+   * @returns {SVG} The SVG instance as minified.
+   */
+  min() {
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new SVG(html.minify(this.toString(), svgOptions), true)
+      )
+    );
   }
 };

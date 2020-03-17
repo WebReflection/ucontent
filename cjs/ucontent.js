@@ -2,20 +2,25 @@
 const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('csso'));
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
+const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
-const htmlOptions = {
+const {assign} = Object;
+
+const cache = umap(new WeakMap);
+
+const commonOptions = {
   collapseWhitespace: true,
-  html5: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: true,
   removeComments: true
 };
 
-const jsOptions = {
-  output: {
-    comments: /^!/
-  }
-};
+const htmlOptions = assign({html5: true}, commonOptions);
+
+const jsOptions = {output: {comments: /^!/}};
+
+const svgOptions = assign({keepClosingSlash: true}, commonOptions);
+
 
 /**
  * The base class for CSS, HTML, JS, and Raw.
@@ -42,9 +47,13 @@ class CSS extends UContent {
    * @returns {CSS} The CSS instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new CSS(csso.minify(this.toString()).css, true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new CSS(csso.minify(this.toString()).css, true)
+      )
+    );
   }
 }
 exports.CSS = CSS;
@@ -58,9 +67,13 @@ class HTML extends UContent {
    * @returns {HTML} The HTML instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new HTML(html.minify(this.toString(), htmlOptions), true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new HTML(html.minify(this.toString(), htmlOptions), true)
+      )
+    );
   }
 }
 exports.HTML = HTML;
@@ -74,9 +87,13 @@ class JS extends UContent {
    * @returns {JS} The JS instance as minified.
    */
   min() {
-    return this.minified ?
-            this :
-            new JS(uglify.minify(this.toString(), jsOptions).code, true);
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new JS(uglify.minify(this.toString(), jsOptions).code, true)
+      )
+    );
   }
 }
 exports.JS = JS;
@@ -94,3 +111,23 @@ class Raw extends UContent {
   }
 }
 exports.Raw = Raw;
+
+
+/**
+ * The class that represents SVG content.
+ */
+class SVG extends UContent {
+  /**
+   * @returns {SVG} The SVG instance as minified.
+   */
+  min() {
+    return this.minified ? this : (
+      cache.get(this) ||
+      cache.set(
+        this,
+        new SVG(html.minify(this.toString(), svgOptions), true)
+      )
+    );
+  }
+}
+exports.SVG = SVG;

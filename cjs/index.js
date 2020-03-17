@@ -1,9 +1,16 @@
 'use strict';
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
-const {CSS, HTML, JS, Raw, UContent} = require('./ucontent.js');
+const {CSS, HTML, JS, Raw, SVG, UContent} = require('./ucontent.js');
 const {parse} = require('./utils.js');
 
 const cache = umap(new WeakMap);
+
+const content = (template, values, svg) => {
+  const {length} = values;
+  const updates = cache.get(template) ||
+                  cache.set(template, parse(template, length, svg));
+  return length ? values.map(update, updates).join('') : updates[0]();
+};
 
 const join = (template, values) => (
   template[0] + values.map(chunks, template).join('')
@@ -54,30 +61,25 @@ exports.raw = raw;
 /**
  * A tag to represent HTML content.
  * @param {string[]} template The template array passed as tag.
- * Differently from other tags, `html` can be used only as template literal tag.
+ * The `html` tag can be used only as template literal tag.
  * @param {any[]} values The spread arguments passed when used as tag.
  * @returns {HTML} An instance of HTML content.
  */
-const html = (template, ...values) => {
-  const {length} = values;
-  const updates = cache.get(template) ||
-                  cache.set(template, parse(template, length));
-  return new HTML(
-    length ? values.map(update, updates).join('') : updates[0]()
-  );
-};
+const html = (template, ...values) => new HTML(
+  content(template, values, false)
+);
 exports.html = html;
 
 /**
  * A tag to represent SVG content.
- * This has no meaning here, but it's a "nice to have" in case a library uses
- * html, and svg functions passed along so that it works with µhtml or others
- * @param {string|string[]|HTML} template The template array passed as tag,
- * or an instance of HTML content, or just some HTML string.
- * @param {any[]} [values] Optional spread arguments passed when used as tag.
- * @returns {HTML} An instance of HTML content.
+ * @param {string[]} template The template array passed as tag.
+ * The `svg` tag can be used only as template literal tag.
+ * @param {any[]} values The spread arguments passed when used as tag.
+ * @returns {SVG} An instance of SVG content.
  */
-const svg = (template, ...values) => html(template, ...values);
+const svg = (template, ...values) => new SVG(
+  content(template, values, true)
+);
 exports.svg = svg;
 
 /**
