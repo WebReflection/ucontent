@@ -86,7 +86,23 @@ If one of the _HTML_ interpolations is `null` or `undefined`, an empty string wi
   * `on...=${'...'}` events passed as string though, or as result of a `js` tag, will be preserved, and in latter case, minified.
 
 
-### How To Test
+## Benchmark
+
+Directly from [pelo](https://github.com/shuhei/pelo#readme) project but without listeners, as these are mostly useless for SSR.
+
+Rendering a simple view 10,000 times:
+
+```js
+node test/pelo.js
+```
+
+|  tag     | time (ms)  |
+| -------- | ---------- |
+| ucontent |  117.668ms |
+|  pelo    |  129.332ms |
+
+
+## How To Live Test
 
 Create a `test.js` file in any folder you like, then `npm i ucontent` in that very same folder.
 
@@ -132,7 +148,7 @@ If you'd like to test the minified version of that output, invoke `.min()` after
 ```
 
 
-#### API Summary Example
+### API Summary Example
 
 ```js
 import {render, css, js, html, raw} from 'ucontent';

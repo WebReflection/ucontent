@@ -82,3 +82,5 @@ console.timeEnd('CSS/JS opt + minified - hot');
 
 // console.log(cold.toString());
 // console.log(min);
+
+require('./pelo');

@@ -20,7 +20,8 @@
   "devDependencies": {
     "ascjs": "^3.1.2",
     "coveralls": "^3.0.9",
-    "nyc": "^15.0.0"
+    "nyc": "^15.0.0",
+    "pelo": "^0.1.0"
   },
   "module": "esm/index.js",
   "dependencies": {
