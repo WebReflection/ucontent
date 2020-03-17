@@ -11,7 +11,7 @@ module.exports = function (html, button) {
       { name: 'Berliner Weiße', price: 3.5, sold: false }
   ];
 
-function drinkView (drink) {
+function drinkView(drink) {
   return html`
     <li>
       ${drink.name} is € ${drink.price}
@@ -20,7 +20,7 @@ function drinkView (drink) {
   `;
 }
 
-function mainView (greeting, name, drinks) {
+function mainView(greeting, name, drinks) {
   return html`
     <div>
       <p>${greeting}, ${name}!</p>
@@ -38,7 +38,7 @@ function mainView (greeting, name, drinks) {
   `;
 }
 
-  return function render () {
+  return function render() {
     return mainView(greeting, name, drinks)
   };
 };
