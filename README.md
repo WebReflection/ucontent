@@ -9,10 +9,23 @@
 
 A <em>micro</em> **SSR** oriented HTML/SVG content generator, but if you are looking for a <em>micro</em> **FE** content generator, check _[µhtml](https://github.com/WebReflection/uhtml#readme)_ out.
 
+```js
+const {render, html} = require('ucontent');
+const fs = require('fs');
+
+const stream = fs.createWriteStream('test.html');
+stream.once('open', () => {
+  render(
+    stream,
+    html`<h1>It's ${new Date}!</h1>`
+  ).end();
+});
+```
+
 
 ## API
 
-  * a `render(where, what)` utility, to render in a `response` object, via `response.write(content)`, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response`). Please note this function is not mandatory to render content, as any content is an instance of `String`, so that if you prefer to render it regularly, you can always use directly `content.toString()` instead.
+  * a `render(writable, what)` utility, to render in a `response` or `stream` object, via `writable.write(content)`, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response` or the `stream`). Please note this helper is _not mandatory_ to render content, as any content is an instance of `String`, so that if you prefer to render it manually, you can always use directly `content.toString()` instead, as every tag returns a specialized instance of _String_.
   * a `html` tag, to render _HTML_ content. Each interpolation passed as layout content, can be either a result from `html`, `css`, `js`, `svg`, or `raw` tag, as well as primitives, such as `string`, `boolean`, `number`, or even `null` or `undefined`. The result is a specialized instance of `String` with a `.min()` method to produce eventually minified _HTML_ content via [html-minifier](https://www.npmjs.com/package/html-minifier). All layout content, if not specialized, will be safely escaped, while attributes will always be escaped to avoid layout malfunctions.
   * a `svg` tag, identical to the `html` one, except minification would preserve any self-closing tag, as in `<rect />`.
   * a `css` tag, to create _CSS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _CSS_ content via [csso](https://www.npmjs.com/package/csso). If passed as `html` or `svg` tag interpolation content, `.min()` will be automatically invoked.
@@ -24,9 +37,10 @@ Except for `html` and `svg` tags, all other tags can be used as regular function
 This allow content to be retrieved a part and then be used as is within these tags.
 
 ```js
-const code = js(require('fs').readFileSync('./code.js'));
-const style = css(require('fs').readFileSync('./style.css'));
-const partial = raw(require('fs').readFileSync('./partial.html'));
+import {readFileSync} from 'fs';
+const code = js(readFileSync('./code.js'));
+const style = css(readFileSync('./style.css'));
+const partial = raw(readFileSync('./partial.html'));
 
 const head = title => html`
   <head>
@@ -47,7 +61,7 @@ const page = title => html`
 `;
 ```
 
-Including `html`, all pre-generated content can be passed along, automatically avoiding minification of the same content per each request.
+All pre-generated content can be passed along, automatically avoiding minification of the same content per each request.
 
 ```js
 // will be re-used and minified only once
@@ -70,20 +84,20 @@ require('http')
   .listen(8080);
 ```
 
-If one of the _HTML_ interpolations is `null` or `undefined`, an empty string will be used instead.
+If one of the _HTML_ interpolations is `null` or `undefined`, an empty string will be placed instead.
 
 
 ## Attributes Logic
 
-  * as it is for _µhtml_ too, sparse attributes are not supported. This is ok `attr=${value}` but this is wrong: `attr="${x} and ${y}"`.
+  * as it is for _µhtml_ too, sparse attributes are not supported: this is ok `attr=${value}`, but this is wrong: `attr="${x} and ${y}"`.
   * all attributes are safely escaped by default.
   * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
-  * `style=${css...}` attributes are minified, if the value is the result of a `css` tag
+  * `style=${css...}` attributes are minified, if the interpolation value is passed as `css` tag
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
+  * `on...=${'...'}` events passed as string or passed as `js` tag will be preserved, and in the `js` tag case, minified.
   * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout
-  * `on...=${'...'}` events passed as string though, or as result of a `js` tag, will be preserved, and in latter case, minified.
 
 
 ## Benchmark
@@ -161,17 +175,21 @@ render(content => response.end(content), html`
     ${meta.map(({name, content}) =>
                   html`<meta name=${name} content=${content}>`)}
     <!-- explicit CSS minification -->
-    <style>${css`
+    <style>
+    ${css`
       body {
         font-family: sans-serif;
       }
-    `}</style>
+    `}
+    </style>
     <!-- explicit JS minification -->
-    <script>${js`
+    <script>
+    ${js`
       function passedThrough(event) {
         console.log(event);
       }
-    `}</script>
+    `}
+    </script>
   </head>
   <!-- discarded callback events -->
   <body onclick=${() => ignored()}>
@@ -184,7 +202,7 @@ render(content => response.end(content), html`
       onmouseover=${'passedThrough.call(this,event)'}
     >
       Hello ${userName}!
-      ${raw`<some> any valid or broken </content>`}
+      ${raw`<some> valid, or even ${'broken'}, </content>`}
     </div>
   </body>
 </html>
