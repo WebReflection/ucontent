@@ -25,6 +25,7 @@
   },
   "module": "esm/index.js",
   "dependencies": {
+    "basic-lru": "^1.0.1",
     "csso": "^4.0.2",
     "html-escaper": "^2.0.0",
     "html-minifier": "^4.0.0",

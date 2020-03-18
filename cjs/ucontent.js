@@ -1,12 +1,18 @@
 'use strict';
+const crypto = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('crypto'));
+
+const LRU = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('basic-lru'));
 const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('csso'));
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
+const hash = text => crypto.createHash('sha256').update(text).digest('base64');
+
 const {assign} = Object;
 
 const cache = umap(new WeakMap);
+const minified = umap(new LRU({maxSize: 100, maxAge: 10000}));
 
 const commonOptions = {
   collapseWhitespace: true,
@@ -39,6 +45,14 @@ class UContent extends String {
 exports.UContent = UContent;
 
 
+const minifyCSS = text => {
+  const sha = hash(text);
+  return (
+    minified.get(sha) ||
+    minified.set(sha, new CSS(csso.minify(text).css, true))
+  );
+};
+
 /**
  * The class that represents CSS content.
  */
@@ -49,15 +63,20 @@ class CSS extends UContent {
   min() {
     return this.minified ? this : (
       cache.get(this) ||
-      cache.set(
-        this,
-        new CSS(csso.minify(this.toString()).css, true)
-      )
+      cache.set(this, minifyCSS(this.toString()))
     );
   }
 }
 exports.CSS = CSS;
 
+
+const minifyHTML = text => {
+  const sha = hash(text);
+  return (
+    minified.get(sha) ||
+    minified.set(sha, new HTML(html.minify(text, htmlOptions), true))
+  );
+};
 
 /**
  * The class that represents HTML content.
@@ -69,15 +88,20 @@ class HTML extends UContent {
   min() {
     return this.minified ? this : (
       cache.get(this) ||
-      cache.set(
-        this,
-        new HTML(html.minify(this.toString(), htmlOptions), true)
-      )
+      cache.set(this, minifyHTML(this.toString()))
     );
   }
 }
 exports.HTML = HTML;
 
+
+const minifyJS = text => {
+  const sha = hash(text);
+  return (
+    minified.get(sha) ||
+    minified.set(sha, new JS(uglify.minify(text, jsOptions).code, true))
+  );
+};
 
 /**
  * The class that represents JS content.
@@ -89,10 +113,7 @@ class JS extends UContent {
   min() {
     return this.minified ? this : (
       cache.get(this) ||
-      cache.set(
-        this,
-        new JS(uglify.minify(this.toString(), jsOptions).code, true)
-      )
+      cache.set(this, minifyJS(this.toString()))
     );
   }
 }
@@ -113,6 +134,14 @@ class Raw extends UContent {
 exports.Raw = Raw;
 
 
+const minifySVG = text => {
+  const sha = hash(text);
+  return (
+    minified.get(sha) ||
+    minified.set(sha, new SVG(html.minify(text, svgOptions), true))
+  );
+};
+
 /**
  * The class that represents SVG content.
  */
@@ -123,10 +152,7 @@ class SVG extends UContent {
   min() {
     return this.minified ? this : (
       cache.get(this) ||
-      cache.set(
-        this,
-        new SVG(html.minify(this.toString(), svgOptions), true)
-      )
+      cache.set(this, minifySVG(this.toString()))
     );
   }
 }
