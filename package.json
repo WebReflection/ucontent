@@ -19,7 +19,7 @@
   "license": "ISC",
   "devDependencies": {
     "ascjs": "^3.1.2",
-    "coveralls": "^3.0.9",
+    "coveralls": "^3.0.11",
     "nyc": "^15.0.0",
     "pelo": "^0.1.0"
   },
@@ -31,7 +31,7 @@
     "hyphenizer": "^0.1.1",
     "uglify-es": "^3.3.9",
     "umap": "^1.0.2",
-    "uparser": "^0.2.0"
+    "uparser": "^0.2.1"
   },
   "repository": {
     "type": "git",
