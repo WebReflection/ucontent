@@ -5,6 +5,8 @@ import {parse} from './utils.js';
 const cache = umap(new WeakMap);
 
 const content = (template, values, svg) => {
+  if (typeof template === 'string')
+    return template;
   const {length} = values;
   const updates = cache.get(template) ||
                   cache.set(template, parse(template, length, svg));

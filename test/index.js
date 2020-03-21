@@ -4,6 +4,7 @@ const assert = (ucontent, output) => {
   console.assert(ucontent == output, ucontent.toString());
 };
 
+assert(html('<div />'), '<div />');
 assert(html`<div />`, '<div></div>');
 assert(html`<div onclick=${Object}/>`, '<div></div>');
 assert(html`<div onclick=${Object} onmouseover=${'callback(event)'}/>`, '<div onmouseover="callback(event)"></div>');

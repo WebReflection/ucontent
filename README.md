@@ -32,7 +32,7 @@ stream.once('open', () => {
   * a `js` tag, to create _JS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _JS_ content via [uglify-es](https://www.npmjs.com/package/uglify-es). If passed as `html` or `svg` tag interpolation content, `.min()` will be automatically invoked.
   * a `raw` tag, to pass along interpolated _HTML_ or _SVG_ values any kind of content, even partial one, or a broken, layout.
 
-Except for `html` and `svg` tags, all other tags can be used as regular functions, as long as the passed value is a string, or a specialized instance.
+All tags can be used as regular functions, as long as the passed value is a string. Except for `html` and `svg`, the value could be a specialized instance, such as `JS`, `CSS`, or `Raw`.
 
 This allow content to be retrieved a part and then be used as is within these tags.
 
