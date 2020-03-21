@@ -31,7 +31,7 @@
   "module": "esm/index.js",
   "dependencies": {
     "csso": "^4.0.2",
-    "html-escaper": "^2.0.0",
+    "html-escaper": "^2.0.1",
     "html-minifier": "^4.0.0",
     "hyphenizer": "^0.1.1",
     "uglify-es": "^3.3.9",
