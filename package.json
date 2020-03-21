@@ -15,6 +15,11 @@
     "ssr",
     "content"
   ],
+  "type": "module",
+  "exports": {
+    "import": "./esm/index.js",
+    "default": "./cjs/index.js"
+  },
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
