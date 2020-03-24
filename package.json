@@ -1,6 +1,6 @@
 {
   "name": "ucontent",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "An SSR oriented HTML content generator",
   "main": "cjs/index.js",
   "scripts": {
