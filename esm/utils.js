@@ -1,6 +1,6 @@
 import csso from 'csso';
 import {escape} from 'html-escaper';
-import hyphenizer from 'hyphenizer';
+import uhyphen from 'uhyphen';
 import instrument from 'uparser';
 import umap from 'umap';
 
@@ -135,9 +135,9 @@ function aria(key) {
   const value = escape(this[key]);
   return key === 'role' ?
           ` role="${value}"` :
-          ` aria-${hyphenizer(key)}="${value}"`;
+          ` aria-${uhyphen(key)}="${value}"`;
 }
 
 function data(key) {
-  return ` data-${hyphenizer(key)}="${escape(this[key])}"`;
+  return ` data-${uhyphen(key)}="${escape(this[key])}"`;
 }

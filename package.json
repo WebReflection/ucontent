@@ -33,8 +33,8 @@
     "csso": "^4.0.2",
     "html-escaper": "^2.0.1",
     "html-minifier": "^4.0.0",
-    "hyphenizer": "^0.1.1",
     "uglify-es": "^3.3.9",
+    "uhyphen": "^0.1.0",
     "umap": "^1.0.2",
     "uparser": "^0.2.1"
   },
