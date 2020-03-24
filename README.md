@@ -95,6 +95,7 @@ If one of the _HTML_ interpolations is `null` or `undefined`, an empty string wi
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
   * `style=${css...}` attributes are minified, if the interpolation value is passed as `css` tag
+  * `ref=${...}` attributes are simply ignored
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
   * `on...=${'...'}` events passed as string or passed as `js` tag will be preserved, and in the `js` tag case, minified.
   * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout

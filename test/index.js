@@ -14,6 +14,7 @@ assert(html`<div .contentEditable=${true}/>`, '<div contenteditable></div>');
 assert(html`<div .whatever=${''}/>`, '<div whatever=""></div>');
 assert(html`<div escaped=${'"'}/>`, '<div escaped="&quot;"></div>');
 assert(html`<div escaped=${null}/>`, '<div></div>');
+assert(html`<div ref=${{}}/>`, '<div></div>');
 const rect = svg`<rect />`;
 assert(html`<div>${rect}</div>`, '<div><rect/></div>');
 assert(html`<svg>${rect}</svg>`, '<svg><rect/></svg>');

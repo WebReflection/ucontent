@@ -1,3 +1,4 @@
+import csso from 'csso';
 import {escape} from 'html-escaper';
 import hyphenizer from 'hyphenizer';
 import instrument from 'uparser';
@@ -70,10 +71,7 @@ export const parse = (template, expectedLength, svg) => {
                 name,
                 quote,
                 inlineStyle.get(value) ||
-                inlineStyle.set(
-                  value,
-                  new CSS(`style{${value}}`).min().slice(6, -1)
-                )
+                inlineStyle.set(value, csso.minifyBlock(value.toString()).css)
               );
             }
             return result;
@@ -111,7 +109,7 @@ export const parse = (template, expectedLength, svg) => {
         default:
           updates.push(value => {
             let result = pre;
-            if (value != null)
+            if (value != null && name !== 'ref')
               result += attribute(name, quote, value);
             return result;
           });

@@ -1,4 +1,5 @@
 'use strict';
+const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('csso'));
 const {escape} = require('html-escaper');
 const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('hyphenizer'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
@@ -71,10 +72,7 @@ const parse = (template, expectedLength, svg) => {
                 name,
                 quote,
                 inlineStyle.get(value) ||
-                inlineStyle.set(
-                  value,
-                  new CSS(`style{${value}}`).min().slice(6, -1)
-                )
+                inlineStyle.set(value, csso.minifyBlock(value.toString()).css)
               );
             }
             return result;
@@ -112,7 +110,7 @@ const parse = (template, expectedLength, svg) => {
         default:
           updates.push(value => {
             let result = pre;
-            if (value != null)
+            if (value != null && name !== 'ref')
               result += attribute(name, quote, value);
             return result;
           });
