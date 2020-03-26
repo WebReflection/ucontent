@@ -1,6 +1,6 @@
 'use strict';
 const {escape} = require('html-escaper');
-const hyphenizer = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('hyphenizer'));
+const uhyphen = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uhyphen'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
@@ -139,9 +139,9 @@ function aria(key) {
   const value = escape(this[key]);
   return key === 'role' ?
           ` role="${value}"` :
-          ` aria-${hyphenizer(key)}="${value}"`;
+          ` aria-${key.toLowerCase()}="${value}"`;
 }
 
 function data(key) {
-  return ` data-${hyphenizer(key)}="${escape(this[key])}"`;
+  return ` data-${uhyphen(key)}="${escape(this[key])}"`;
 }
