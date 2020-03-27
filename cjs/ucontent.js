@@ -33,7 +33,7 @@ class UContent extends String {
    * @param {boolean} [minified] The optional flag to avoid duplicated `min()`.
    */
   constructor(content, minified = false) {
-    super(content).minified = minified;
+    super(String(content)).minified = minified;
   }
 }
 exports.UContent = UContent;
