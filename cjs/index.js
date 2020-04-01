@@ -3,6 +3,8 @@ const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 const {CSS, HTML, JS, Raw, SVG, UContent} = require('./ucontent.js');
 const {parse} = require('./utils.js');
 
+const {isArray} = Array;
+
 const cache = umap(new WeakMap);
 
 const content = (template, values, svg) => {
@@ -16,11 +18,8 @@ const join = (template, values) => (
   template[0] + values.map(chunks, template).join('')
 );
 
-const stringify = (template, values) => (
-  typeof template === 'string' || template instanceof UContent ?
-    template :
-    join(template, values)
-);
+const stringify = (template, values) =>
+                    isArray(template) ? join(template, values) : template;
 
 /**
  * A tag to represent CSS content.
