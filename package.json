@@ -23,9 +23,9 @@
   "author": "Andrea Giammarchi",
   "license": "ISC",
   "devDependencies": {
-    "ascjs": "^3.1.2",
-    "coveralls": "^3.0.11",
-    "nyc": "^15.0.0",
+    "ascjs": "^4.0.0",
+    "coveralls": "^3.1.0",
+    "nyc": "^15.0.1",
     "pelo": "^0.1.0"
   },
   "module": "esm/index.js",
@@ -33,7 +33,7 @@
     "csso": "^4.0.3",
     "html-escaper": "^3.0.0",
     "html-minifier": "^4.0.0",
-    "uglify-es": "^3.3.9",
+    "terser": "^4.6.13",
     "uhyphen": "^0.1.0",
     "umap": "^1.0.2",
     "uparser": "^0.2.1"

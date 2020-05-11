@@ -1,7 +1,7 @@
 'use strict';
 const csso = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('csso'));
 const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
-const uglify = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uglify-es'));
+const Terser = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('terser'));
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
 
 const {assign} = Object;
@@ -91,7 +91,7 @@ class JS extends UContent {
       cache.get(this) ||
       cache.set(
         this,
-        new JS(uglify.minify(this.toString(), jsOptions).code, true)
+        new JS(Terser.minify(this.toString(), jsOptions).code, true)
       )
     );
   }

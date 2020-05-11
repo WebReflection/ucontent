@@ -1,6 +1,6 @@
 import csso from 'csso';
 import html from 'html-minifier';
-import uglify from 'uglify-es';
+import Terser from 'terser';
 import umap from 'umap';
 
 const {assign} = Object;
@@ -87,7 +87,7 @@ export class JS extends UContent {
       cache.get(this) ||
       cache.set(
         this,
-        new JS(uglify.minify(this.toString(), jsOptions).code, true)
+        new JS(Terser.minify(this.toString(), jsOptions).code, true)
       )
     );
   }
