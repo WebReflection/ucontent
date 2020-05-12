@@ -1,10 +1,9 @@
 'use strict';
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
-const {CSS, HTML, JS, Raw, SVG, UContent} = require('./ucontent.js');
+const {CSS, HTML, JS, Raw, SVG} = require('./ucontent.js');
 const {parse} = require('./utils.js');
 
 const {isArray} = Array;
-const {create} = Object;
 
 const cache = umap(new WeakMap);
 

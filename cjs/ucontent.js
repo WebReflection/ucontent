@@ -35,8 +35,7 @@ class UContent extends String {
   constructor(content, minified = false) {
     super(String(content)).minified = minified;
   }
-}
-exports.UContent = UContent;
+};
 
 
 /**

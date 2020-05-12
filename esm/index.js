@@ -1,9 +1,8 @@
 import umap from 'umap';
-import {CSS, HTML, JS, Raw, SVG, UContent} from './ucontent.js';
+import {CSS, HTML, JS, Raw, SVG} from './ucontent.js';
 import {parse} from './utils.js';
 
 const {isArray} = Array;
-const {create} = Object;
 
 const cache = umap(new WeakMap);
 

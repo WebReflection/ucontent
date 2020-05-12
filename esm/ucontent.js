@@ -25,7 +25,7 @@ const svgOptions = assign({keepClosingSlash: true}, commonOptions);
  * The base class for CSS, HTML, JS, and Raw.
  * @private
  */
-export class UContent extends String {
+class UContent extends String {
   /**
    * 
    * @param {string} content The string representing some content.
