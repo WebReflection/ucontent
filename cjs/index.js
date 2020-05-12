@@ -4,6 +4,7 @@ const {CSS, HTML, JS, Raw, SVG, UContent} = require('./ucontent.js');
 const {parse} = require('./utils.js');
 
 const {isArray} = Array;
+const {create} = Object;
 
 const cache = umap(new WeakMap);
 
@@ -20,6 +21,14 @@ const join = (template, values) => (
 
 const stringify = (template, values) =>
                     isArray(template) ? join(template, values) : template;
+
+const uhtmlParity = fn => {
+  // both `.node` and `.for` are for feature parity with uhtml
+  // but don't do anything different from regular function call
+  fn.node = fn;
+  fn.for = () => fn;
+  return fn;
+};
 
 /**
  * A tag to represent CSS content.
@@ -64,9 +73,9 @@ exports.raw = raw;
  * @param {any[]} values The spread arguments passed when used as tag.
  * @returns {HTML} An instance of HTML content.
  */
-const html = (template, ...values) => new HTML(
+const html = uhtmlParity((template, ...values) => new HTML(
   content(template, values, false)
-);
+));
 exports.html = html;
 
 /**
@@ -76,9 +85,9 @@ exports.html = html;
  * @param {any[]} values The spread arguments passed when used as tag.
  * @returns {SVG} An instance of SVG content.
  */
-const svg = (template, ...values) => new SVG(
+const svg = uhtmlParity((template, ...values) => new SVG(
   content(template, values, true)
-);
+));
 exports.svg = svg;
 
 /**
