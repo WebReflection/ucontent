@@ -30,6 +30,7 @@ assert(html`<div>${true}</div>`, '<div>true</div>');
 assert(html.for({})`<div>${123}</div>`, '<div>123</div>');
 
 assert(html`<script>${js`function test() { console.log(1); }`.min().min()}</script>`, '<script>function test(){console.log(1)}</script>');
+assert(html`<script>${js(function test() { console.log(0); }).min().min()}</script>`, '<script>function test(){console.log(0)}</script>');
 assert(html`<style>${css`body { font-family: sans-serif; }`.min().min()}</style>`, '<style>body{font-family:sans-serif}</style>');
 assert(html`<div>${raw`<bro"ken />`.min().min()}</div>`, '<div><bro"ken /></div>');
 assert(html`<div>${raw`<bro"ken ${2} />`}</div>`, '<div><bro"ken 2 /></div>');
