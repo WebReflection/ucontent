@@ -81,7 +81,7 @@ require('http')
           <script>${jsContent}</script>
         </head>
       </html>
-    `.min());
+    `.min()).end();
   })
   .listen(8080);
 ```
