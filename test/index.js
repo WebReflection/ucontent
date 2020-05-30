@@ -43,6 +43,10 @@ assert(html`<div style="${inlineStyle}"></div>`, '<div style="font-family:sans-s
 assert(html`<div style="${inlineStyle}"></div>`, '<div style="font-family:sans-serif"></div>');
 assert(html`<div style="${'font-family: sans-serif'}"></div>`, '<div style="font-family: sans-serif"></div>');
 
+const fn = () => {};
+fn.toString = () => 'console.log("test")';
+assert(html`<div onclick=${fn}></div>`, '<div onclick="console.log(&quot;test&quot;)"></div>');
+
 try {
   html(['', '']);
   console.assert(false, 'not throwing with bad template');
