@@ -6,6 +6,7 @@ const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 
 const {CSS, HTML, JS, Raw, SVG} = require('./ucontent.js');
 
+const {toString} = Function;
 const {keys} = Object;
 
 const inlineStyle = umap(new WeakMap);
@@ -99,10 +100,14 @@ const parse = (template, expectedLength, svg) => {
           break;
         case name.slice(0, 2) === 'on':
           updates.push(value => {
+            const type = typeof value;
             let result = pre;
-            // allow listeners only if passed as string
+            // allow listeners only if passed as string,
+            // as functions with a special toString method,
             // or as instance of JS
-            if (typeof value === 'string')
+            if (type === 'string' || (
+              type === 'function' && value.toString !== toString
+            ))
               result += attribute(name, quote, value);
             else if (value instanceof JS)
               result += attribute(name, quote, value.min());
