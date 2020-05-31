@@ -25,7 +25,7 @@ stream.once('open', () => {
 
 ## API
 
-  * a `render(writable, what)` utility, to render in a `response` or `stream` object, via `writable.write(content)`, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response` or the `stream`). Please note this helper is _not mandatory_ to render content, as any content is an instance of `String`, so that if you prefer to render it manually, you can always use directly `content.toString()` instead, as every tag returns a specialized instance of _String_.
+  * a `render(writable, what)` utility, to render in a `response` or `stream` object, via `writable.write(content)`, or through a callback, the content provided by one of the tags. The function returns the result of `callback(content)` invoke, or the the passed first parameter as is (i.e. the `response` or the `stream`). Please note this helper is _not mandatory_ to render content, as any content is an instance of `String`, so that if you prefer to render it manually, you can always use directly `content.toString()` instead, as every tag returns a specialized instance of _String_. This API _doesn't_ set any explicit headers for `response` objects based on `what`.
   * a `html` tag, to render _HTML_ content. Each interpolation passed as layout content, can be either a result from `html`, `css`, `js`, `svg`, or `raw` tag, as well as primitives, such as `string`, `boolean`, `number`, or even `null` or `undefined`. The result is a specialized instance of `String` with a `.min()` method to produce eventually minified _HTML_ content via [html-minifier](https://www.npmjs.com/package/html-minifier). All layout content, if not specialized, will be safely escaped, while attributes will always be escaped to avoid layout malfunctions.
   * a `svg` tag, identical to the `html` one, except minification would preserve any self-closing tag, as in `<rect />`.
   * a `css` tag, to create _CSS_ content. Its interpolations will be stringified, and it returns a specialized instance of `String` with a `.min()` method to produce eventually minified _CSS_ content via [csso](https://www.npmjs.com/package/csso). If passed as `html` or `svg` tag interpolation content, `.min()` will be automatically invoked.
@@ -72,6 +72,7 @@ const cssContent = css`/* same CSS content to serve */`;
 
 require('http')
   .createServer((request, response) => {
+    response.writeHead(200, {'content-type': 'text/html;charset=utf-8'});
     render(response, html`
       <!doctype html>
       <html>
@@ -87,6 +88,8 @@ require('http')
 ```
 
 If one of the _HTML_ interpolations is `null` or `undefined`, an empty string will be placed instead.
+
+> _Note:_ When writing to `stream` objects using the `render()` API make sure to call end on it
 
 
 
