@@ -6,10 +6,10 @@ const {isArray} = Array;
 
 const cache = umap(new WeakMap);
 
-const content = (template, values, svg) => {
+const content = (template, values, svg, minified) => {
   const {length} = values;
   const updates = cache.get(template) ||
-                  cache.set(template, parse(template, length, svg));
+                  cache.set(template, parse(template, length, svg, minified));
   return length ? values.map(update, updates).join('') : updates[0]();
 };
 
@@ -25,6 +25,7 @@ const uhtmlParity = fn => {
   // but don't do anything different from regular function call
   fn.node = fn;
   fn.for = () => fn;
+  fn.minified = false;
   return fn;
 };
 
@@ -69,7 +70,7 @@ export const raw = (template, ...values) => new Raw(
  * @returns {HTML} An instance of HTML content.
  */
 export const html = uhtmlParity((template, ...values) => new HTML(
-  content(template, values, false)
+  content(template, values, false, html.minified)
 ));
 
 /**
@@ -80,7 +81,7 @@ export const html = uhtmlParity((template, ...values) => new HTML(
  * @returns {SVG} An instance of SVG content.
  */
 export const svg = uhtmlParity((template, ...values) => new SVG(
-  content(template, values, true)
+  content(template, values, true, svg.minified)
 ));
 
 /**

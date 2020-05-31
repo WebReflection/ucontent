@@ -89,6 +89,43 @@ require('http')
 If one of the _HTML_ interpolations is `null` or `undefined`, an empty string will be placed instead.
 
 
+
+## Production: HTML + SVG Implicit Minification
+
+While both utilities expose a `.min()` helper, repeated minification of big chunks of layout can be quite expensive.
+
+As the template literal is the key to map updates, which happen before `.min()` gets invoked, it is necessary to tell upfront if such template should be minified or not, so that reusing the same template later on, would result into a pre-minified set of chunks.
+
+In order to do so, `html` and `svg` expose a `minified` boolean property, which is `false` by default, but it can be switched to `true` in production.
+
+```js
+import {render, html, svg} from 'ucontent';
+
+// enable pre minified chunks
+const {PRODUCTION} = process.env;
+html.minified = !!PRODUCTION;
+svg.minified = !!PRODUCTION;
+
+const page = () => html`
+  <!doctype html>
+  <html>
+    <h1>
+      This will always be minified
+    </h1>
+    <p>
+      ${Date.now()} + ${Math.random()}
+    </p>
+  </html>
+`;
+// note, no .min() necessary
+
+render(response, page()).end();
+```
+
+In this way, local tests would have a clean layout, while production code will always be minified, where each template literal will be minified once, instead of each time `.min()` is invoked.
+
+
+
 ## Attributes Logic
 
   * as it is for _µhtml_ too, sparse attributes are not supported: this is ok `attr=${value}`, but this is wrong: `attr="${x} and ${y}"`.
@@ -100,6 +137,7 @@ If one of the _HTML_ interpolations is `null` or `undefined`, an empty string wi
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
   * `on...=${'...'}` events passed as string or passed as `js` tag will be preserved, and in the `js` tag case, minified.
   * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout
+
 
 
 ## Benchmark
@@ -116,6 +154,7 @@ node test/pelo.js
 | -------- | ---------- |
 | ucontent |  117.668ms |
 |  pelo    |  129.332ms |
+
 
 
 ## How To Live Test
@@ -163,50 +202,59 @@ If you'd like to test the minified version of that output, invoke `.min()` after
   ).end();
 ```
 
+You can also use `html.minified = true` on top, and see similar results.
+
+
 
 ### API Summary Example
 
 ```js
 import {render, css, js, html, raw} from 'ucontent';
 
+// turn on implicit html minification (production)
+html.minified = true;
+
+// optionally
+// svg.minified = true;
+
 render(content => response.end(content), html`
-<!doctype html>
-<html lang=${user.lang}>
-  <head>
-    <!-- dynamic interpolations -->
-    ${meta.map(({name, content}) =>
-                  html`<meta name=${name} content=${content}>`)}
-    <!-- explicit CSS minification -->
-    <style>
-    ${css`
-      body {
-        font-family: sans-serif;
-      }
-    `}
-    </style>
-    <!-- explicit JS minification -->
-    <script>
-    ${js`
-      function passedThrough(event) {
-        console.log(event);
-      }
-    `}
-    </script>
-  </head>
-  <!-- discarded callback events -->
-  <body onclick=${() => ignored()}>
-    <div
-      class=${classes.join(' ')}
-      always=${'escaped'}
-      .contentEditable=${false}
-      data=${{name: userName, id: userId}}
-      aria=${{role: 'button', labelledby: 'id'}}
-      onmouseover=${'passedThrough.call(this,event)'}
-    >
-      Hello ${userName}!
-      ${raw`<some> valid, or even ${'broken'}, </content>`}
-    </div>
-  </body>
-</html>
-`.min());
+  <!doctype html>
+  <html lang=${user.lang}>
+    <head>
+      <!-- dynamic interpolations -->
+      ${meta.map(({name, content}) =>
+                    html`<meta name=${name} content=${content}>`)}
+      <!-- explicit CSS minification -->
+      <style>
+      ${css`
+        body {
+          font-family: sans-serif;
+        }
+      `}
+      </style>
+      <!-- explicit JS minification -->
+      <script>
+      ${js`
+        function passedThrough(event) {
+          console.log(event);
+        }
+      `}
+      </script>
+    </head>
+    <!-- discarded callback events -->
+    <body onclick=${() => ignored()}>
+      <div
+        class=${classes.join(' ')}
+        always=${'escaped'}
+        .contentEditable=${false}
+        data=${{name: userName, id: userId}}
+        aria=${{role: 'button', labelledby: 'id'}}
+        onmouseover=${'passedThrough.call(this,event)'}
+      >
+        Hello ${userName}!
+        ${raw`<some> valid, or even ${'broken'}, </content>`}
+      </div>
+    </body>
+  </html>
+`);
 ```

@@ -1,5 +1,7 @@
 const {render, html} = require('../cjs');
 
+html.minified = true;
+
 require('http').createServer((req, res) => {
   res.writeHead(200, {'content-type': 'text/html;charset=utf-8'});
   render(content => res.end(content), html`
@@ -17,8 +19,7 @@ require('http').createServer((req, res) => {
       </p>
     `}</body>
     </html>
-    `.min()
-  );
+  `);
 }).listen(8080);
 
 console.log('http://localhost:8080/');

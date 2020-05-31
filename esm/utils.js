@@ -1,4 +1,5 @@
 import {escape} from 'html-escaper';
+import html from 'html-minifier';
 import uhyphen from 'uhyphen';
 import instrument from 'uparser';
 import umap from 'umap';
@@ -6,7 +7,7 @@ import umap from 'umap';
 import {CSS, HTML, JS, Raw, SVG} from './ucontent.js';
 
 const {toString} = Function;
-const {keys} = Object;
+const {assign, keys} = Object;
 
 const inlineStyle = umap(new WeakMap);
 
@@ -14,6 +15,21 @@ const prefix = 'isµ' + Date.now();
 const interpolation = new RegExp(
   `(<!--${prefix}(\\d+)-->|\\s*${prefix}(\\d+)=('|")([^\\4]+?)\\4)`, 'g'
 );
+
+// const attrs = new RegExp(`(${prefix}\\d+)=([^'">\\s]+)`, 'g');
+
+const commonOptions = {
+  collapseWhitespace: true,
+  conservativeCollapse: true,
+  preventAttributesEscaping: true,
+  removeAttributeQuotes: false,
+  removeComments: true,
+  ignoreCustomComments: [new RegExp(`${prefix}\\d+`)]
+};
+
+const htmlOptions = assign({html5: true}, commonOptions);
+
+const svgOptions = assign({keepClosingSlash: true}, commonOptions);
 
 const attribute = (name, quote, value) =>
                     ` ${name}=${quote}${escape(value)}${quote}`;
@@ -41,8 +57,11 @@ const getValue = value => {
   return value == null ? '' : escape(String(value));
 };
 
-export const parse = (template, expectedLength, svg) => {
-  const html = instrument(template, prefix, svg).trim();
+const minify = ($, svg) => html.minify($, svg ? svgOptions : htmlOptions);
+
+export const parse = (template, expectedLength, svg, minified) => {
+  const text = instrument(template, prefix, svg);
+  const html = minified ? minify(text, svg) : text;
   const updates = [];
   let i = 0;
   let match = null;

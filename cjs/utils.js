@@ -1,5 +1,6 @@
 'use strict';
 const {escape} = require('html-escaper');
+const html = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('html-minifier'));
 const uhyphen = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uhyphen'));
 const instrument = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('uparser'));
 const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* istanbul ignore next */ m)(require('umap'));
@@ -7,7 +8,7 @@ const umap = (m => m.__esModule ? /* istanbul ignore next */ m.default : /* ista
 const {CSS, HTML, JS, Raw, SVG} = require('./ucontent.js');
 
 const {toString} = Function;
-const {keys} = Object;
+const {assign, keys} = Object;
 
 const inlineStyle = umap(new WeakMap);
 
@@ -15,6 +16,21 @@ const prefix = 'isµ' + Date.now();
 const interpolation = new RegExp(
   `(<!--${prefix}(\\d+)-->|\\s*${prefix}(\\d+)=('|")([^\\4]+?)\\4)`, 'g'
 );
+
+// const attrs = new RegExp(`(${prefix}\\d+)=([^'">\\s]+)`, 'g');
+
+const commonOptions = {
+  collapseWhitespace: true,
+  conservativeCollapse: true,
+  preventAttributesEscaping: true,
+  removeAttributeQuotes: false,
+  removeComments: true,
+  ignoreCustomComments: [new RegExp(`${prefix}\\d+`)]
+};
+
+const htmlOptions = assign({html5: true}, commonOptions);
+
+const svgOptions = assign({keepClosingSlash: true}, commonOptions);
 
 const attribute = (name, quote, value) =>
                     ` ${name}=${quote}${escape(value)}${quote}`;
@@ -42,8 +58,11 @@ const getValue = value => {
   return value == null ? '' : escape(String(value));
 };
 
-const parse = (template, expectedLength, svg) => {
-  const html = instrument(template, prefix, svg).trim();
+const minify = ($, svg) => html.minify($, svg ? svgOptions : htmlOptions);
+
+const parse = (template, expectedLength, svg, minified) => {
+  const text = instrument(template, prefix, svg);
+  const html = minified ? minify(text, svg) : text;
   const updates = [];
   let i = 0;
   let match = null;

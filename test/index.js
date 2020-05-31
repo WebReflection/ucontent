@@ -65,3 +65,30 @@ assert(server.content, '<p></p>');
 
 assert(render(server, () => html`<div />`), server);
 assert(server.content, '<div></div>');
+
+html.minified = true;
+svg.minified = true;
+
+assert(html`<div />`, '<div></div>');
+assert(html`<div onclick=${Object}/>`, '<div></div>');
+assert(html`<div onclick=${Object} onmouseover=${'callback(event)'}/>`, '<div onmouseover="callback(event)"></div>');
+assert(svg`<div .contentEditable=${null} />`, '<div/>');
+assert(html`<div .contentEditable=${false}/>`, '<div></div>');
+assert(html`<div .contentEditable=${true}/>`, '<div contenteditable></div>');
+assert(html`<div .whatever=${''}/>`, '<div whatever=""></div>');
+assert(html`<div escaped=${'"'}/>`, '<div escaped="&quot;"></div>');
+assert(html`<div escaped=${null}/>`, '<div></div>');
+const mrect = svg.for({})`<rect />`;
+assert(html.node`<div>${mrect}</div>`, '<div><rect/></div>');
+assert(html`<svg>${mrect}</svg>`, '<svg><rect/></svg>');
+assert(html`<div>${Buffer.from('"')}</div>`, '<div>&quot;</div>');
+assert(html`<div>${new String('"')}</div>`, '<div>&quot;</div>');
+assert(html`<div data=${{no:1, withHyphens:2}}/>`, '<div data-no="1" data-with-hyphens="2"></div>');
+assert(html`<div aria=${{role: 'button', labelledby: 'id'}}/>`, '<div role="button" aria-labelledby="id"></div>');
+assert(html`<div>${[1,2].map(n => html`<p>${n}</p>`)}</div>`, '<div><p>1</p><p>2</p></div>');
+assert(html`<div>${[1,2].map(n => `<p>${n}</p>`)}</div>`, '<div>&lt;p&gt;1&lt;/p&gt;&lt;p&gt;2&lt;/p&gt;</div>');
+assert(html`<div>${{}}</div>`, '<div>[object Object]</div>');
+assert(html`<div>${null}</div>`, '<div></div>');
+assert(html`<div>${void 0}</div>`, '<div></div>');
+assert(html`<div>${true}</div>`, '<div>true</div>');
+assert(html.for({})`<div>${123}</div>`, '<div>123</div>');
