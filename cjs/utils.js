@@ -119,17 +119,31 @@ const parse = (template, expectedLength, svg, minified) => {
           break;
         case name.slice(0, 2) === 'on':
           updates.push(value => {
-            const type = typeof value;
             let result = pre;
+            // allow handleEvent based objects that
+            // follow the `onMethod` convention
             // allow listeners only if passed as string,
             // as functions with a special toString method,
+            // as objects with handleEvents and a method,
             // or as instance of JS
-            if (type === 'string' || (
-              type === 'function' && value.toString !== toString
-            ))
-              result += attribute(name, quote, value);
-            else if (value instanceof JS)
-              result += attribute(name, quote, value.min());
+            switch (typeof value) {
+              case 'object':
+                if (value instanceof JS) {
+                  result += attribute(name, quote, value.min());
+                  break;
+                }
+                if (!(name in value))
+                  break;
+                value = value[name];
+                if (typeof value !== 'function')
+                  break;
+              case 'function':
+                if (value.toString === toString)
+                  break;
+              case 'string':
+                result += attribute(name, quote, value);
+                break;
+            }
             return result;
           });
           break;

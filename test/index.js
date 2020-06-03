@@ -92,3 +92,14 @@ assert(html`<div>${null}</div>`, '<div></div>');
 assert(html`<div>${void 0}</div>`, '<div></div>');
 assert(html`<div>${true}</div>`, '<div>true</div>');
 assert(html.for({})`<div>${123}</div>`, '<div>123</div>');
+
+const handler1 = {};
+assert(html`<div onclick=${handler1} />`, '<div></div>');
+
+const onclick = () => {};
+onclick.toString = () => 'test';
+const handler2 = {onclick};
+assert(html`<div onclick=${handler2} />`, '<div onclick="test"></div>');
+
+const handler3 = {onclick: true};
+assert(html`<div onclick=${handler3} />`, '<div></div>');
