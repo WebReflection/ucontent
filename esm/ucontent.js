@@ -9,6 +9,7 @@ const cache = umap(new WeakMap);
 
 const commonOptions = {
   collapseWhitespace: true,
+  preserveLineBreaks: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: true,
   removeComments: true

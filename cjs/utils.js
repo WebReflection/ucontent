@@ -22,6 +22,7 @@ const interpolation = new RegExp(
 const commonOptions = {
   collapseWhitespace: true,
   conservativeCollapse: true,
+  preserveLineBreaks: true,
   preventAttributesEscaping: true,
   removeAttributeQuotes: false,
   removeComments: true,
