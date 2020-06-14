@@ -133,13 +133,13 @@ In this way, local tests would have a clean layout, while production code will a
 
   * as it is for _µhtml_ too, sparse attributes are not supported: this is ok `attr=${value}`, but this is wrong: `attr="${x} and ${y}"`.
   * all attributes are safely escaped by default.
-  * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout
+  * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout.
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
-  * `data=${object}` attributes are assigned _hyphenized_ as `data-user-land` attributes
-  * `style=${css...}` attributes are minified, if the interpolation value is passed as `css` tag
+  * `style=${css...}` attributes are minified, if the interpolation value is passed as `css` tag.
+  * `data=${object}` attributes (_soon to be deprecated_) and `.dataset=${object}` (_future proof_) attributes are assigned _hyphenized_ as `data-user-land` attributes.
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
   * `on...=${'...'}` events passed as string or passed as `js` tag will be preserved, and in the `js` tag case, minified.
-  * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout
+  * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout.
 
 
 

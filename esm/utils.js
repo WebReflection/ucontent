@@ -78,7 +78,7 @@ export const parse = (template, expectedLength, svg, minified) => {
         case name === 'aria':
           updates.push(value => (pre + keys(value).map(aria, value).join('')));
           break;
-        case name === 'data':
+        case name === 'data' && !/<object\b[^>]+$/i.test(html.slice(0, i)):
           updates.push(value => (pre + keys(value).map(data, value).join('')));
           break;
         case name === 'style':
@@ -103,19 +103,22 @@ export const parse = (template, expectedLength, svg, minified) => {
         // setters as boolean attributes (.disabled .contentEditable)
         case name[0] === '.':
           const lower = name.slice(1).toLowerCase();
-          updates.push(value => {
-            let result = pre;
-            // null, undefined, and false are not shown at all
-            if (value != null && value !== false) {
-              // true means boolean attribute, just show the name
-              if (value === true)
-                result += ` ${lower}`;
-              // in all other cases, just escape it in quotes
-              else
-                result += attribute(lower, quote, value);
-            }
-            return result;
-          });
+          updates.push(lower === 'dataset' ?
+            (value => (pre + keys(value).map(data, value).join(''))) :
+            (value => {
+              let result = pre;
+              // null, undefined, and false are not shown at all
+              if (value != null && value !== false) {
+                // true means boolean attribute, just show the name
+                if (value === true)
+                  result += ` ${lower}`;
+                // in all other cases, just escape it in quotes
+                else
+                  result += attribute(lower, quote, value);
+              }
+              return result;
+            })
+          );
           break;
         case name.slice(0, 2) === 'on':
           updates.push(value => {
