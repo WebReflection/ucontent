@@ -78,7 +78,7 @@ export const parse = (template, expectedLength, svg, minified) => {
         case name === 'aria':
           updates.push(value => (pre + keys(value).map(aria, value).join('')));
           break;
-        case name === 'data' && !/<object\b[^>]+$/i.test(html.slice(0, i)):
+        case name === 'data':
           updates.push(value => (pre + keys(value).map(data, value).join('')));
           break;
         case name === 'style':

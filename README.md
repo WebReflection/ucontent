@@ -22,6 +22,12 @@ stream.once('open', () => {
 });
 ```
 
+### V2 Breaking Change
+
+The recently introduced `data` helper [could conflict](https://github.com/WebReflection/uhtml/issues/14) with some node such as `<object>`, hence it has been replaced by the `.dataset` utility. Since `element.dataset = object` is an invalid operation, the sugar to simplify `data-` attributes is now never ambiguous and future-proof: `<element .dataset=${...} />` it is.
+
+This is aligned with _µhtml_ and _lighterhtml_ recent changes too.
+
 
 ## API
 
@@ -136,7 +142,7 @@ In this way, local tests would have a clean layout, while production code will a
   * if an attribute value is `null` or `undefined`, the attribute won't show up in the layout.
   * `aria=${object}` attributes are assigned _hyphenized_ as `aria-a11y` attributes. The `role` is passed instead as `role=...`.
   * `style=${css...}` attributes are minified, if the interpolation value is passed as `css` tag.
-  * `data=${object}` attributes (_soon to be deprecated_) and `.dataset=${object}` (_future proof_) attributes are assigned _hyphenized_ as `data-user-land` attributes.
+  * `.dataset=${object}` setter is assigned _hyphenized_ as `data-user-land` attributes.
   * `.contentEditable=${...}`, `.disabled=${...}` and any attribute defined as setter, will not be in the layout if the passed value is `null`, `undefined`, or `false`, it will be in the layout if the passed value is `true`, it will contain escaped value in other cases. The attribute is normalized without the dot prefix, and lower-cased.
   * `on...=${'...'}` events passed as string or passed as `js` tag will be preserved, and in the `js` tag case, minified.
   * `on...=${...}` events that pass a callback will be ignored, as it's impossible to bring scope in the layout.
@@ -250,7 +256,7 @@ render(content => response.end(content), html`
         class=${classes.join(' ')}
         always=${'escaped'}
         .contentEditable=${false}
-        data=${{name: userName, id: userId}}
+        .dataset=${{name: userName, id: userId}}
         aria=${{role: 'button', labelledby: 'id'}}
         onmouseover=${'passedThrough.call(this,event)'}
       >
