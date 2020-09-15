@@ -12,7 +12,7 @@ const {assign, keys} = Object;
 
 const inlineStyle = umap(new WeakMap);
 
-const prefix = 'isµ' + Date.now();
+const prefix = 'isµ';// + Date.now();
 const interpolation = new RegExp(
   `(<!--${prefix}(\\d+)-->|\\s*${prefix}(\\d+)=('|")([^\\4]+?)\\4)`, 'g'
 );
