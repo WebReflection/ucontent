@@ -59,11 +59,11 @@ const getValue = value => {
   return value == null ? '' : escape(String(value));
 };
 
-const minify = ($, svg) => html.minify($, svg ? svgOptions : htmlOptions);
+const minify = ($, svg, options) => html.minify($, svg ? {...svgOptions, ...options} : {...htmlOptions, ...options});
 
 const parse = (template, expectedLength, svg, minified) => {
   const text = instrument(template, prefix, svg);
-  const html = minified ? minify(text, svg) : text;
+  const html = minified ? minify(text, svg, minified) : text;
   const updates = [];
   let i = 0;
   let match = null;

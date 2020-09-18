@@ -120,7 +120,7 @@ export class SVG extends UContent {
       cache.get(this) ||
       cache.set(
         this,
-        new SVG(html.minify(this.toString(), {...svgOptions, options}), true)
+        new SVG(html.minify(this.toString(), {...svgOptions, ...options}), true)
       )
     );
   }
