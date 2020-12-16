@@ -64,12 +64,12 @@ export class HTML extends UContent {
   /**
    * @returns {HTML} The HTML instance as minified.
    */
-  min() {
+  min(options) {
     return this.minified ? this : (
       cache.get(this) ||
       cache.set(
         this,
-        new HTML(html.minify(this.toString(), htmlOptions), true)
+        new HTML(html.minify(this.toString(), {...htmlOptions, ...options}), true)
       )
     );
   }
@@ -83,12 +83,12 @@ export class JS extends UContent {
   /**
    * @returns {JS} The JS instance as minified.
    */
-  min() {
+  min(options) {
     return this.minified ? this : (
       cache.get(this) ||
       cache.set(
         this,
-        new JS(Terser.minify(this.toString(), jsOptions).code, true)
+        new JS(Terser.minify(this.toString(), {...jsOptions, ...options}).code, true)
       )
     );
   }
@@ -115,12 +115,12 @@ export class SVG extends UContent {
   /**
    * @returns {SVG} The SVG instance as minified.
    */
-  min() {
+  min(options) {
     return this.minified ? this : (
       cache.get(this) ||
       cache.set(
         this,
-        new SVG(html.minify(this.toString(), svgOptions), true)
+        new SVG(html.minify(this.toString(), {...svgOptions, ...options}), true)
       )
     );
   }
